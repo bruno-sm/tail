@@ -1,0 +1,20 @@
+opam-version: "2.0"
+name: "tail"
+version: "1.0"
+synopsis: "The tail programming language"
+maintainer: "bruno-sm <bru.1bruno@gmail.com>"
+authors: "bruno-sm <bru.1bruno@gmail.com>"
+homepage: "https://github.com/bruno-sm/tail"
+bug-reports: "https://github.com/bruno-sm/tail/issues"
+dev-repo: "git+https://github.com/bruno-sm/tail.git"
+license: "GPL-3.0"
+depends: [
+  "base"
+  "cmdliner"
+  "dune" {build}
+  "sedlex"
+  "menhir"
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]

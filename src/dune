@@ -1,0 +1,8 @@
+(executable
+  (name tailc)
+  (public_name tailc)
+  (package tail)
+  (libraries base cmdliner sedlex))
+
+(menhir
+  (modules parser))
