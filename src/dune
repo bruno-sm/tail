@@ -5,4 +5,5 @@
   (libraries base cmdliner sedlex))
 
 (menhir
+  (flags -v)
   (modules parser))
