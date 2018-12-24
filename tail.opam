@@ -12,7 +12,7 @@ depends: [
   "base"
   "cmdliner"
   "dune" {build}
-  "sedlex"
+  "sedlex" {>= "1.99.4"}
   "menhir"
 ]
 build: [

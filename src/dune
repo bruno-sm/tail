@@ -2,7 +2,9 @@
   (name tailc)
   (public_name tailc)
   (package tail)
-  (libraries base cmdliner sedlex))
+  (modules tailc ast parser lexer)
+  (libraries base cmdliner sedlex)
+  (preprocess (pps sedlex.ppx)))
 
 (menhir
   (flags -v)
