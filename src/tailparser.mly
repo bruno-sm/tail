@@ -40,6 +40,8 @@
 %token OPEN_BRACKET
 %token CLOSE_BRACKET
 %token SPACE
+%token UNKNOWN_TOKEN
+%token EOF
 
 %nonassoc ELSE
 %right ASSIGN
@@ -55,11 +57,11 @@
 %nonassoc OPEN_BRACKET
 
 %start parse
-%type <expression> parse
+%type <Ast.expression> parse
 %%
 
 parse:
-  | e = expression  { e }
+  | e = expression EOF  { e }
 ;
 
 

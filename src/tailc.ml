@@ -5,10 +5,12 @@ type command = CmdDefault
 (* Compiler *)
 let tailc source output command =
   try
-    let lexbuf = Sedlexing.Utf8.from_channel @@ open_in source in
+    let sedlexbuf = Sedlexing.Utf8.from_channel @@ open_in source in
+    let lexbuf = Lexing.from_string "" in
+    Printf.printf "source: %s\noutput: %s\n" source output;
     match command with
-      | CmdDefault -> Parser.parse Lexer.lexer lexbuf
-      | CmdDebug -> Lexer.show_lexing lexbuf
+      | CmdDefault -> Tailparser.parse (Taillexer.lexer_for_menhir sedlexbuf) lexbuf |> Ast.string_of_expression |> print_endline
+      | CmdDebug -> Taillexer.show_lexing sedlexbuf
   with
     | Sys_error msg -> print_endline msg
 
@@ -30,7 +32,7 @@ let info =
 (* Argument for the source file name *)
 let source =
   let doc = "Tail source file to compile." in
-  Arg.(required & pos ~rev:true 0 (some file) None & info [] ~docv:"SOURCE_FILE" ~doc)
+  Arg.(required & opt (some file) None & info ["s"; "source"] ~docv:"SOURCE_FILE" ~doc)
 
 
 (* Argument for the output file name *)
