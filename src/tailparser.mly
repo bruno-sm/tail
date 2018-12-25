@@ -6,8 +6,7 @@
 %token <float> REAL_NUMBER
 %token <string> NAME
 %token <string> STRING
-%token TRUE
-%token FALSE
+%token <string> ATOM
 %token SEQUENCE
 %token OPEN_PARENTHESES
 %token CLOSE_PARENTHESES
@@ -27,10 +26,12 @@
 %token COMPLEMENT
 %token INT_TYPE
 %token REAL_TYPE
-%token BOOLEAN_TYPE
 %token STRING_TYPE
+%token ATOM_TYPE
+%token <string> SPECIFIC_ATOM_TYPE
 %token LIST_TYPE
 %token MATRIX_TYPE
+/* Dummy token for give more precedence to sequences inside a matrix */
 %token MATRIX_SEPARATOR
 %token <int> UNIVERSE_TYPE
 %token UNKNOWN_TYPE
@@ -182,14 +183,17 @@ type_expression:
         | _ -> Tuple([t1; t2])
     }
 
+  | ATOM_TYPE
+    { Atom }
+
+  | n = SPECIFIC_ATOM_TYPE
+    { SpecificAtom(n) }
+
   | INT_TYPE
     { Int }
 
   | REAL_TYPE
     { Real }
-
-  | BOOLEAN_TYPE
-    { Bool }
 
   | STRING_TYPE
     { String }
@@ -221,9 +225,6 @@ type_constructor:
   | c = number_constructor
     { c }
 
-  | c = bool_constructor
-    { c }
-
   | c = string_constructor
     { c }
 
@@ -250,15 +251,6 @@ number_constructor:
 ;
 
 
-bool_constructor:
-  | TRUE
-    { BoolLiteral(true) }
-
-  | FALSE
-    { BoolLiteral(false) }
-;
-
-
 string_constructor:
   | s = STRING
     { StringLiteral(s) }
@@ -266,7 +258,7 @@ string_constructor:
 
 
 atom_constructor:
-  | COLON; n = name
+  | n = ATOM
     { AtomLiteral(n) }
 ;
 
@@ -301,7 +293,7 @@ matrix_constructor:
 
 
 matrix_elements:
-  | l = element_list; MATRIX_SEPARATOR; m = matrix_elements
+  | l = element_list; SEQUENCE; m = matrix_elements %prec MATRIX_SEPARATOR
     { l::m }
 
   | l = element_list
