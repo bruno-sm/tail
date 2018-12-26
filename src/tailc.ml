@@ -9,7 +9,7 @@ let tailc source output command =
     let lexbuf = Lexing.from_string "" in
     Printf.printf "source: %s\noutput: %s\n" source output;
     match command with
-      | CmdDefault -> Tailparser.parse (Taillexer.lexer_for_menhir sedlexbuf) lexbuf |> Ast.string_of_expression |> print_endline
+      | CmdDefault -> Tailparser.parse (Taillexer.lexer_for_menhir (Taillexer.new_context ()) sedlexbuf) lexbuf |> Ast.string_of_expression |> print_endline
       | CmdDebug -> Taillexer.show_lexing sedlexbuf
   with
     | Sys_error msg -> print_endline msg
