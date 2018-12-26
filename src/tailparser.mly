@@ -12,8 +12,8 @@
 %token CLOSE_PARENTHESES
 %token LAMBDA
 %token COLON
-%token BLOCK_BEGIN
-%token BLOCK_END
+%token <int> BLOCK_BEGIN
+%token <int> BLOCK_END
 %token ASSIGN
 %token COMMA
 /* Dummy token for give more precedence to commas declaring a tuple type */
@@ -45,14 +45,14 @@
 %token EOF
 
 %nonassoc ELSE
+%left SEQUENCE
 %right ASSIGN
 %nonassoc COLON
-%left SEQUENCE
 %left COMMA
 %left UNION
 %left INTERSECTION
-%nonassoc COMPLEMENT
 %right ARROW
+%nonassoc COMPLEMENT
 %left TYPE_COMMA
 %nonassoc LIST_TYPE MATRIX_TYPE
 %nonassoc OPEN_BRACKET
@@ -75,6 +75,9 @@ expression:
 
   | b = block
     { b }
+
+  | v = variable
+    { v }
 
   | l = lambda
     { l }
@@ -110,39 +113,48 @@ sequence:
 block:
   | BLOCK_BEGIN; e = expression; BLOCK_END
     { Block(e) }
+
+  | BLOCK_BEGIN; e = expression; SEQUENCE; BLOCK_END
+    { Block(e) }
 ;
 
 
 lambda:
-  | LAMBDA; v = name; COLON; t = type_expression; ASSIGN; e = expression
+  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; e = expression
     { Lambda(v, t, e) }
 
-  | LAMBDA; v = name; ASSIGN; e = expression
+  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; SEQUENCE; e = expression
+    { Lambda(v, t, e) }
+
+  | LAMBDA; v = NAME; ASSIGN; e = expression
+    { Lambda(v, Unknown, e) }
+
+  | LAMBDA; v = NAME; ASSIGN; SEQUENCE; e = expression
     { Lambda(v, Unknown, e) }
 ;
 
 
 function_call:
-  | n = name; OPEN_PARENTHESES; arg = expression; CLOSE_PARENTHESES
+  | n = NAME; OPEN_PARENTHESES; arg = expression; CLOSE_PARENTHESES
     { FunctionCall(n, arg) }
 ;
 
 
 declaration:
-  | n = name; COLON; t = type_expression
+  | n = NAME; COLON; t = type_expression
     { Declaration(n, t) }
 ;
 
 
 assignment:
-  | n = name; ASSIGN;  e = expression
+  | n = NAME; ASSIGN;  e = expression
     { Assignment(n, e) }
 ;
 
 
-name:
+variable:
   | n = NAME
-    { n }
+    { Variable n }
 ;
 
 

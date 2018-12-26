@@ -23,29 +23,44 @@ let universe_type = [%sedlex.regexp? "U", number]
 
 
 type context = {
-  mutable token_number : int
+  mutable token_number : int;
+  mutable check_identation : bool;
+  mutable ident_depth : int
 }
 
-let new_context () = {token_number = 0}
+let new_context () = {token_number = 0; check_identation = true; ident_depth = 0}
 
 
 (* This function is called after finding a breakline *)
 let rec skip_breaklines context lexbuf =
   match%sedlex lexbuf with
-    | white_space -> skip_breaklines context lexbuf
+    | Sub (white_space, "\t") -> skip_breaklines context lexbuf
 
-    | eof -> EOF
+    | eof -> lexer context lexbuf
 
-    | _ -> SEQUENCE
+    | _ -> context.check_identation <- true; SEQUENCE
 
 
-let rec lexer context lexbuf =
+and lexer context lexbuf =
   (* Ignores initial breaklines *)
   if context.token_number = 0 then
     match%sedlex lexbuf with
-    | Star white_space -> ()
+    | Star (Sub (white_space, "\t")) -> ()
     | _ -> ()
   else ();
+
+  (* Checks the identation level *)
+  if context.check_identation then begin
+    context.check_identation <- false;
+    match%sedlex lexbuf with
+    | Star "\t" -> let ident_depth = String.length (Utf8.lexeme lexbuf) in
+                   let ident_diff = ident_depth - context.ident_depth in
+                   context.ident_depth <- ident_depth;
+                   if ident_diff > 0 then BLOCK_BEGIN ident_diff
+                   else if ident_diff < 0 then BLOCK_END ident_diff
+                   else lexer context lexbuf
+    | _ -> lexer context lexbuf
+  end else
 
   let token = match%sedlex lexbuf with
     | number -> INT_NUMBER (Utf8.lexeme lexbuf |> int_of_string)
@@ -113,17 +128,17 @@ let rec lexer context lexbuf =
 
     | "]" -> CLOSE_BRACKET
 
-    | "begin" -> BLOCK_BEGIN
-
-    | "end" -> BLOCK_END
-
     | "\n" -> skip_breaklines context lexbuf
 
     | white_space -> lexer context lexbuf
 
     | name -> NAME (Utf8.lexeme lexbuf)
 
-    | eof -> EOF
+    | eof -> if context.ident_depth > 0 then
+              let ident_diff = -context.ident_depth in
+              context.ident_depth <- 0;
+              BLOCK_END ident_diff
+             else EOF
 
     | any -> UNKNOWN_TOKEN
 
@@ -151,8 +166,8 @@ let rec show_lexing' context lexbuf =
   | CLOSE_PARENTHESES -> Printf.printf "CLOSE_PARENTHESES "; show_lexing' context lexbuf
   | LAMBDA -> Printf.printf "LAMBDA "; show_lexing' context lexbuf
   | COLON -> Printf.printf "COLON "; show_lexing' context lexbuf
-  | BLOCK_BEGIN -> Printf.printf "BLOCK_BEGIN "; show_lexing' context lexbuf
-  | BLOCK_END -> Printf.printf "BLOCK_END "; show_lexing' context lexbuf
+  | BLOCK_BEGIN t -> Printf.printf "BLOCK_BEGIN(%d) " t; show_lexing' context lexbuf
+  | BLOCK_END t -> Printf.printf "BLOCK_END(%d) " t; show_lexing' context lexbuf
   | ASSIGN -> Printf.printf "ASSIGN "; show_lexing' context lexbuf
   | COMMA -> Printf.printf "COMMA "; show_lexing' context lexbuf
   | IF -> Printf.printf "IF "; show_lexing' context lexbuf
@@ -176,7 +191,7 @@ let rec show_lexing' context lexbuf =
   | OPEN_BRACKET -> Printf.printf "OPEN_BRACKET "; show_lexing' context lexbuf
   | CLOSE_BRACKET -> Printf.printf "CLOSE_BRACKET "; show_lexing' context lexbuf
   | UNKNOWN_TOKEN -> Printf.printf "UNKNOWN_TOKEN "; show_lexing' context lexbuf
-  | EOF -> Printf.printf "\n";
+  | EOF -> Printf.printf "EOF\n";
   | _ -> Printf.printf "Other "; show_lexing' context lexbuf
 
 

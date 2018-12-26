@@ -58,6 +58,7 @@ let rec string_of_type_expression = function
 type expression = Sequence of expression list
                 | Parenthesis of expression
                 | Block of expression
+                | Variable of string
                 | Lambda of string * type_expression * expression
                 | FunctionCall of string * expression
                 | Declaration of string * type_expression
@@ -86,6 +87,8 @@ let rec string_of_expression = function
   | Parenthesis e -> Printf.sprintf "Parenthesis\n\t| %s\n" @@ string_of_expression e
 
   | Block e -> Printf.sprintf "Block\n\t| %s\n" @@ string_of_expression e
+
+  | Variable v -> Printf.sprintf "Variable\n\t| %s\n" v
 
   | Lambda (v, t, e) -> Printf.sprintf "Lambda(%s)\n\t| %s\n\t| %s\n"
                         v
