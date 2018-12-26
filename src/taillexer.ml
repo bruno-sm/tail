@@ -23,7 +23,13 @@ let universe_type = [%sedlex.regexp? "U", number]
 
 
 
-let rec lexer lexbuf =
+let rec skip_breaklines lexbuf =
+  match%sedlex lexbuf with
+    | white_space -> skip_breaklines lexbuf
+    | eof -> EOF
+    | _ -> SEQUENCE
+
+and lexer lexbuf =
   match%sedlex lexbuf with
     | number -> INT_NUMBER (Utf8.lexeme lexbuf |> int_of_string)
 
@@ -91,6 +97,8 @@ let rec lexer lexbuf =
     | "]" -> CLOSE_BRACKET
 
     | name -> NAME (Utf8.lexeme lexbuf)
+
+    | "\n" -> skip_breaklines lexbuf
 
     | white_space -> lexer lexbuf
 

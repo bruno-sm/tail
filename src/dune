@@ -8,4 +8,8 @@
 
 (menhir
   (modules tailparser)
-  (flags "-v" "--dump" "--explain" "--inspection" "--table"))
+  (flags "-v"))
+
+(env
+  (dev
+    (flags (:standard -warn-error -A))))
