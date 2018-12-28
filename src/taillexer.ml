@@ -38,7 +38,7 @@ let rec skip_breaklines context lexbuf =
 
     | eof -> lexer context lexbuf
 
-    | _ -> context.check_identation <- true; SEQUENCE
+    | _ -> context.check_identation <- true; NEWLINE
 
 
 and lexer context lexbuf =
@@ -148,13 +148,6 @@ and lexer context lexbuf =
   token
 
 
-let lexer_for_menhir context (sedlexbuf : Sedlexing.lexbuf) (lexbuf : Lexing.lexbuf) =
-  let (token, start_pos, curr_pos) = (Sedlexing.with_tokenizer (lexer context) sedlexbuf) () in
-  lexbuf.lex_start_p <- start_pos;
-  lexbuf.lex_curr_p <- curr_pos;
-  token
-
-
 let rec show_lexing' context lexbuf =
   match lexer context lexbuf with
   | INT_NUMBER n -> Printf.printf "INT_NUMBER(%d) " n; show_lexing' context lexbuf
@@ -162,6 +155,7 @@ let rec show_lexing' context lexbuf =
   | NAME n -> Printf.printf "NAME(%s) " n; show_lexing' context lexbuf
   | ATOM a -> Printf.printf "ATOM(%s) " a; show_lexing' context lexbuf
   | SEQUENCE -> Printf.printf "SEQUENCE "; show_lexing' context lexbuf
+  | NEWLINE -> Printf.printf "NEWLINE "; show_lexing' context lexbuf
   | OPEN_PARENTHESES -> Printf.printf "OPEN_PARENTHESES "; show_lexing' context lexbuf
   | CLOSE_PARENTHESES -> Printf.printf "CLOSE_PARENTHESES "; show_lexing' context lexbuf
   | LAMBDA -> Printf.printf "LAMBDA "; show_lexing' context lexbuf

@@ -3,22 +3,29 @@ type command = CmdDefault
 
 
 (* Compiler *)
-let tailc source output command =
+let rec tailc source output command =
   try
-    let sedlexbuf = Sedlexing.Utf8.from_channel @@ open_in source in
-    let lexbuf = Lexing.from_string "" in
+    let lexbuf = Sedlexing.Utf8.from_channel @@ open_in source in
     Printf.printf "source: %s\noutput: %s\n" source output;
     match command with
       | CmdDefault ->
         begin try
-          Tailparser.parse (Taillexer.lexer_for_menhir (Taillexer.new_context ()) sedlexbuf) lexbuf |> Ast.string_of_expression |> print_endline
+          compile lexbuf |> Ast.string_of_expression |> print_endline
         with
-        | Tailparser.Error -> Printf.printf "Tailparser error in %s" (Sedlexing.Utf8.lexeme sedlexbuf)
+        | Tailparser.Error -> Printf.printf "Tailparser error in %s" (Sedlexing.Utf8.lexeme lexbuf)
         end
 
-      | CmdDebug -> Taillexer.show_lexing sedlexbuf
+      | CmdDebug -> Taillexer.show_lexing lexbuf
   with
     | Sys_error msg -> print_endline msg
+
+
+and compile lexbuf =
+  let context = Taillexer.new_context () in
+  let supplier = Sedlexing.with_tokenizer (Taillexer.lexer context) lexbuf in
+  let (start_position, _) = Sedlexing.lexing_positions lexbuf in
+  let start_checkpoint = Tailparser.Incremental.parse start_position in
+  Tailparser.MenhirInterpreter.loop supplier start_checkpoint
 
 
 (* Command line arguments using cmdliner *)

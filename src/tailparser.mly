@@ -8,6 +8,7 @@
 %token <string> STRING
 %token <string> ATOM
 %token SEQUENCE
+%token NEWLINE
 %token OPEN_PARENTHESES
 %token CLOSE_PARENTHESES
 %token LAMBDA
@@ -45,7 +46,7 @@
 %token EOF
 
 %nonassoc ELSE
-%left SEQUENCE
+%left SEQUENCE NEWLINE
 %right ASSIGN
 %nonassoc COLON
 %left COMMA
@@ -103,11 +104,16 @@ expression:
 
 
 sequence:
-  | s = sequence; SEQUENCE; e = expression
+  | s = sequence; sequence_operator; e = expression
     { e::s }
 
-  | e1 = expression; SEQUENCE; e2 = expression
+  | e1 = expression; sequence_operator; e2 = expression
     { [e1; e2] }
+
+
+%inline sequence_operator:
+  | SEQUENCE  {}
+  | NEWLINE {}
 
 
 block:
@@ -123,13 +129,7 @@ lambda:
   | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; e = expression
     { Lambda(v, t, e) }
 
-  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; SEQUENCE; e = expression
-    { Lambda(v, t, e) }
-
   | LAMBDA; v = NAME; ASSIGN; e = expression
-    { Lambda(v, Unknown, e) }
-
-  | LAMBDA; v = NAME; ASSIGN; SEQUENCE; e = expression
     { Lambda(v, Unknown, e) }
 ;
 
