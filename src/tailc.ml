@@ -1,5 +1,13 @@
+module L = Taillexer
+
+module P = Tailparser
+
+module I = Tailparser.MenhirInterpreter
+
+
 type command = CmdDefault
              | CmdDebug
+
 
 
 (* Compiler *)
@@ -10,7 +18,7 @@ let rec tailc source output command =
     match command with
       | CmdDefault ->
         begin try
-          compile lexbuf |> Ast.string_of_expression |> print_endline
+          compile lexbuf
         with
         | Tailparser.Error -> Printf.printf "Tailparser error in %s" (Sedlexing.Utf8.lexeme lexbuf)
         end
@@ -21,11 +29,45 @@ let rec tailc source output command =
 
 
 and compile lexbuf =
+  parse lexbuf
+
+and parse lexbuf =
+  let rec parse_loop lexbuf context checkpoint =
+    match checkpoint with
+    | I.InputNeeded _ ->
+      let token = L.lexer context lexbuf in
+      let (start_pos, curr_pos) = Sedlexing.lexing_positions lexbuf in
+      let checkpoint = I.offer checkpoint (token, start_pos, curr_pos) in
+      Printf.printf "Passing token %s (line %d, column %d)\n"
+        (L.string_of_token token)
+        curr_pos.pos_lnum (curr_pos.pos_cnum - curr_pos.pos_bol + 1);
+      parse_loop lexbuf context checkpoint
+
+    | I.Shifting (_, _, request) ->
+      Printf.printf "Shifting\n";
+      let checkpoint = I.resume checkpoint in
+      parse_loop lexbuf context checkpoint
+
+    | I.AboutToReduce _ ->
+      Printf.printf "About to reduce\n";
+      let prev_cehckpoint = checkpoint in
+      let checkpoint = I.resume checkpoint in
+      parse_loop lexbuf context checkpoint
+
+    | I.HandlingError env ->
+      let (_, curr_pos) = Sedlexing.lexing_positions lexbuf in
+      Printf.fprintf stderr
+        "Syntax error at line %d\n"
+        curr_pos.pos_lnum
+
+    | I.Accepted v -> v |> Ast.string_of_expression |> print_endline
+
+    | I.Rejected -> Printf.printf "Input rejected by the parser\n"
+  in
   let context = Taillexer.new_context () in
-  let supplier = Sedlexing.with_tokenizer (Taillexer.lexer context) lexbuf in
   let (start_position, _) = Sedlexing.lexing_positions lexbuf in
   let start_checkpoint = Tailparser.Incremental.parse start_position in
-  Tailparser.MenhirInterpreter.loop supplier start_checkpoint
+  parse_loop lexbuf context start_checkpoint
 
 
 (* Command line arguments using cmdliner *)
