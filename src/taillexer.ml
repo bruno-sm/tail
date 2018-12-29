@@ -38,7 +38,7 @@ let rec skip_breaklines context lexbuf =
 
     | eof -> lexer context lexbuf
 
-    | _ -> context.check_identation <- true; NEWLINE
+    | _ -> context.check_identation <- true; lexer context lexbuf
 
 
 and lexer context lexbuf =
@@ -85,6 +85,8 @@ and lexer context lexbuf =
     | ',' -> COMMA
 
     | "if" -> IF
+
+    | "then" -> THEN
 
     | "elif" -> ELIF
 
@@ -148,45 +150,53 @@ and lexer context lexbuf =
   token
 
 
+let string_of_token = function
+  | INT_NUMBER n -> Printf.sprintf "INT_NUMBER(%d)" n
+  | REAL_NUMBER x -> Printf.sprintf "REAL_NUMBER(%f)" x
+  | NAME n -> Printf.sprintf "NAME(%s)" n
+  | ATOM a -> Printf.sprintf "ATOM(%s)" a
+  | SEQUENCE -> Printf.sprintf "SEQUENCE"
+  | OPEN_PARENTHESES -> Printf.sprintf "OPEN_PARENTHESES"
+  | CLOSE_PARENTHESES -> Printf.sprintf "CLOSE_PARENTHESES"
+  | LAMBDA -> Printf.sprintf "LAMBDA"
+  | COLON -> Printf.sprintf "COLON"
+  | BLOCK_BEGIN t -> Printf.sprintf "BLOCK_BEGIN(%d)" t
+  | BLOCK_END t -> Printf.sprintf "BLOCK_END(%d)" t
+  | ASSIGN -> Printf.sprintf "ASSIGN"
+  | COMMA -> Printf.sprintf "COMMA"
+  | IF -> Printf.sprintf "IF"
+  | THEN -> Printf.sprintf "THEN"
+  | ELIF -> Printf.sprintf "ELIF"
+  | ELSE -> Printf.sprintf "ELSE"
+  | UNION -> Printf.sprintf "UNION"
+  | INTERSECTION -> Printf.sprintf "INTERSECTION"
+  | COMPLEMENT -> Printf.sprintf "COMPLEMENT"
+  | INT_TYPE -> Printf.sprintf "INT_TYPE"
+  | REAL_TYPE -> Printf.sprintf "REAL_TYPE"
+  | STRING_TYPE -> Printf.sprintf "STRING_TYPE"
+  | ATOM_TYPE -> Printf.sprintf "ATOM_TYPE"
+  | SPECIFIC_ATOM_TYPE a -> Printf.sprintf "SPECIFIC_ATOM_TYPE(%s)" a
+  | LIST_TYPE -> Printf.sprintf "LIST_TYPE"
+  | MATRIX_TYPE -> Printf.sprintf "MATRIX_TYPE"
+  | UNIVERSE_TYPE n -> Printf.sprintf "UNIVERSE_TYPE(%d)" n
+  | UNKNOWN_TYPE -> Printf.sprintf "UNKNOWN_TYPE"
+  | ARROW -> Printf.sprintf "ARROW"
+  | OPEN_LIST -> Printf.sprintf "OPEN_LIST"
+  | CLOSE_LIST -> Printf.sprintf "CLOSE_LIST"
+  | OPEN_BRACKET -> Printf.sprintf "OPEN_BRACKET"
+  | CLOSE_BRACKET -> Printf.sprintf "CLOSE_BRACKET"
+  | UNKNOWN_TOKEN -> Printf.sprintf "UNKNOWN_TOKEN"
+  | EOF -> Printf.sprintf "EOF"
+  | _ -> Printf.sprintf "Other"
+
+
 let rec show_lexing' context lexbuf =
-  match lexer context lexbuf with
-  | INT_NUMBER n -> Printf.printf "INT_NUMBER(%d) " n; show_lexing' context lexbuf
-  | REAL_NUMBER x -> Printf.printf "REAL_NUMBER(%f) " x; show_lexing' context lexbuf
-  | NAME n -> Printf.printf "NAME(%s) " n; show_lexing' context lexbuf
-  | ATOM a -> Printf.printf "ATOM(%s) " a; show_lexing' context lexbuf
-  | SEQUENCE -> Printf.printf "SEQUENCE "; show_lexing' context lexbuf
-  | NEWLINE -> Printf.printf "NEWLINE "; show_lexing' context lexbuf
-  | OPEN_PARENTHESES -> Printf.printf "OPEN_PARENTHESES "; show_lexing' context lexbuf
-  | CLOSE_PARENTHESES -> Printf.printf "CLOSE_PARENTHESES "; show_lexing' context lexbuf
-  | LAMBDA -> Printf.printf "LAMBDA "; show_lexing' context lexbuf
-  | COLON -> Printf.printf "COLON "; show_lexing' context lexbuf
-  | BLOCK_BEGIN t -> Printf.printf "BLOCK_BEGIN(%d) " t; show_lexing' context lexbuf
-  | BLOCK_END t -> Printf.printf "BLOCK_END(%d) " t; show_lexing' context lexbuf
-  | ASSIGN -> Printf.printf "ASSIGN "; show_lexing' context lexbuf
-  | COMMA -> Printf.printf "COMMA "; show_lexing' context lexbuf
-  | IF -> Printf.printf "IF "; show_lexing' context lexbuf
-  | ELIF -> Printf.printf "ELIF "; show_lexing' context lexbuf
-  | ELSE -> Printf.printf "ELSE "; show_lexing' context lexbuf
-  | UNION -> Printf.printf "UNION "; show_lexing' context lexbuf
-  | INTERSECTION -> Printf.printf "INTERSECTION "; show_lexing' context lexbuf
-  | COMPLEMENT -> Printf.printf "COMPLEMENT "; show_lexing' context lexbuf
-  | INT_TYPE -> Printf.printf "INT_TYPE "; show_lexing' context lexbuf
-  | REAL_TYPE -> Printf.printf "REAL_TYPE "; show_lexing' context lexbuf
-  | STRING_TYPE -> Printf.printf "STRING_TYPE "; show_lexing' context lexbuf
-  | ATOM_TYPE -> Printf.printf "ATOM_TYPE "; show_lexing' context lexbuf
-  | SPECIFIC_ATOM_TYPE a -> Printf.printf "SPECIFIC_ATOM_TYPE(%s) " a; show_lexing' context lexbuf
-  | LIST_TYPE -> Printf.printf "LIST_TYPE "; show_lexing' context lexbuf
-  | MATRIX_TYPE -> Printf.printf "MATRIX_TYPE "; show_lexing' context lexbuf
-  | UNIVERSE_TYPE n -> Printf.printf "UNIVERSE_TYPE(%d) " n; show_lexing' context lexbuf
-  | UNKNOWN_TYPE -> Printf.printf "UNKNOWN_TYPE "; show_lexing' context lexbuf
-  | ARROW -> Printf.printf "ARROW "; show_lexing' context lexbuf
-  | OPEN_LIST -> Printf.printf "OPEN_LIST "; show_lexing' context lexbuf
-  | CLOSE_LIST -> Printf.printf "CLOSE_LIST "; show_lexing' context lexbuf
-  | OPEN_BRACKET -> Printf.printf "OPEN_BRACKET "; show_lexing' context lexbuf
-  | CLOSE_BRACKET -> Printf.printf "CLOSE_BRACKET "; show_lexing' context lexbuf
-  | UNKNOWN_TOKEN -> Printf.printf "UNKNOWN_TOKEN "; show_lexing' context lexbuf
-  | EOF -> Printf.printf "EOF\n";
-  | _ -> Printf.printf "Other "; show_lexing' context lexbuf
+  let token = lexer context lexbuf in
+  match token with
+  | EOF -> Printf.printf "%s " @@ string_of_token token
+  | _ ->
+    Printf.printf "%s\n" @@ string_of_token token;
+    show_lexing' context lexbuf
 
 
 let show_lexing lexbuf = show_lexing' (new_context ()) lexbuf

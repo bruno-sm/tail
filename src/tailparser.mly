@@ -8,7 +8,6 @@
 %token <string> STRING
 %token <string> ATOM
 %token SEQUENCE
-%token NEWLINE
 %token OPEN_PARENTHESES
 %token CLOSE_PARENTHESES
 %token LAMBDA
@@ -20,6 +19,7 @@
 /* Dummy token for give more precedence to commas declaring a tuple type */
 %token TYPE_COMMA
 %token IF
+%token THEN
 %token ELIF
 %token ELSE
 %token UNION
@@ -46,7 +46,7 @@
 %token EOF
 
 %nonassoc ELSE
-%left SEQUENCE NEWLINE
+%left SEQUENCE
 %right ASSIGN
 %nonassoc COLON
 %left COMMA
@@ -55,8 +55,6 @@
 %right ARROW
 %nonassoc COMPLEMENT
 %left TYPE_COMMA
-%nonassoc LIST_TYPE MATRIX_TYPE
-%nonassoc OPEN_BRACKET
 
 %start parse
 %type <Ast.expression> parse
@@ -104,23 +102,15 @@ expression:
 
 
 sequence:
-  | s = sequence; sequence_operator; e = expression
+  | s = sequence; SEQUENCE; e = expression
     { e::s }
 
-  | e1 = expression; sequence_operator; e2 = expression
+  | e1 = expression; SEQUENCE; e2 = expression
     { [e1; e2] }
-
-
-%inline sequence_operator:
-  | SEQUENCE  {}
-  | NEWLINE {}
 
 
 block:
   | BLOCK_BEGIN; e = expression; BLOCK_END
-    { Block(e) }
-
-  | BLOCK_BEGIN; e = expression; SEQUENCE; BLOCK_END
     { Block(e) }
 ;
 
@@ -159,13 +149,13 @@ variable:
 
 
 if_expression:
-  | IF; cond = expression; do_if = expression; do_elif = elif_expressions; do_else = else_expression
+  | IF; cond = expression; THEN; do_if = expression; do_elif = elif_expressions; do_else = else_expression
     { If(cond, do_if, do_elif, do_else) }
 ;
 
 
 elif_expressions:
-  | ELIF; cond = expression; do_if = expression; elifs = elif_expressions
+  | ELIF; cond = expression; THEN; do_if = expression; elifs = elif_expressions
     { Elif(cond, do_if)::elifs }
 
   | epsilon
