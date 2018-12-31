@@ -8,6 +8,7 @@ open Shexp_process.Infix
 
 
 let main : unit t =
+  chdir "../../../../src/parser" begin
   file_exists "syntax_errors.messages" >>= function
   | true ->
     run "menhir" ["--update-errors"; "syntax_errors.messages"; "syntax.mly"] |> stdout_to "syntax_errors_aux.messages"
@@ -22,6 +23,7 @@ let main : unit t =
   | false ->
     run "menhir" ["--list-errors"; "syntax.mly"] |> stdout_to "syntax_errors.messages"
     >> echo "menhir --list-errors syntax.mly > syntax_errors.messages"
+  end
 
 
 let () =
