@@ -1,15 +1,13 @@
+(env
+  (dev
+    (flags (:standard -warn-error -A))))
+
 (executable
   (name tailc)
   (public_name tailc)
   (package tail)
-  (modules tailc ast tailparser taillexer)
+  (modules tailc ast syntax tailparser taillexer syntax_error_messages)
   (libraries base cmdliner sedlex menhirLib)
   (preprocess (pps sedlex.ppx)))
 
-(menhir
-  (modules tailparser)
-  (flags "-v" "--table"))
-
-(env
-  (dev
-    (flags (:standard -warn-error -A))))
+(include_subdirs unqualified)

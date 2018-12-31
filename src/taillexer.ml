@@ -150,46 +150,6 @@ and lexer context lexbuf =
   token
 
 
-let string_of_token = function
-  | INT_NUMBER n -> Printf.sprintf "INT_NUMBER(%d)" n
-  | REAL_NUMBER x -> Printf.sprintf "REAL_NUMBER(%f)" x
-  | NAME n -> Printf.sprintf "NAME(%s)" n
-  | ATOM a -> Printf.sprintf "ATOM(%s)" a
-  | SEQUENCE -> Printf.sprintf "SEQUENCE"
-  | OPEN_PARENTHESES -> Printf.sprintf "OPEN_PARENTHESES"
-  | CLOSE_PARENTHESES -> Printf.sprintf "CLOSE_PARENTHESES"
-  | LAMBDA -> Printf.sprintf "LAMBDA"
-  | COLON -> Printf.sprintf "COLON"
-  | BLOCK_BEGIN t -> Printf.sprintf "BLOCK_BEGIN(%d)" t
-  | BLOCK_END t -> Printf.sprintf "BLOCK_END(%d)" t
-  | ASSIGN -> Printf.sprintf "ASSIGN"
-  | COMMA -> Printf.sprintf "COMMA"
-  | IF -> Printf.sprintf "IF"
-  | THEN -> Printf.sprintf "THEN"
-  | ELIF -> Printf.sprintf "ELIF"
-  | ELSE -> Printf.sprintf "ELSE"
-  | UNION -> Printf.sprintf "UNION"
-  | INTERSECTION -> Printf.sprintf "INTERSECTION"
-  | COMPLEMENT -> Printf.sprintf "COMPLEMENT"
-  | INT_TYPE -> Printf.sprintf "INT_TYPE"
-  | REAL_TYPE -> Printf.sprintf "REAL_TYPE"
-  | STRING_TYPE -> Printf.sprintf "STRING_TYPE"
-  | ATOM_TYPE -> Printf.sprintf "ATOM_TYPE"
-  | SPECIFIC_ATOM_TYPE a -> Printf.sprintf "SPECIFIC_ATOM_TYPE(%s)" a
-  | LIST_TYPE -> Printf.sprintf "LIST_TYPE"
-  | MATRIX_TYPE -> Printf.sprintf "MATRIX_TYPE"
-  | UNIVERSE_TYPE n -> Printf.sprintf "UNIVERSE_TYPE(%d)" n
-  | UNKNOWN_TYPE -> Printf.sprintf "UNKNOWN_TYPE"
-  | ARROW -> Printf.sprintf "ARROW"
-  | OPEN_LIST -> Printf.sprintf "OPEN_LIST"
-  | CLOSE_LIST -> Printf.sprintf "CLOSE_LIST"
-  | OPEN_BRACKET -> Printf.sprintf "OPEN_BRACKET"
-  | CLOSE_BRACKET -> Printf.sprintf "CLOSE_BRACKET"
-  | UNKNOWN_TOKEN -> Printf.sprintf "UNKNOWN_TOKEN"
-  | EOF -> Printf.sprintf "EOF"
-  | _ -> Printf.sprintf "Other"
-
-
 let rec show_lexing' context lexbuf =
   let token = lexer context lexbuf in
   match token with

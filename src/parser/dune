@@ -1,0 +1,20 @@
+(menhir
+  (modules syntax)
+  (flags "-v" "--explain" "--table"))
+
+
+; Updates syntax_errors.messages and checks completeness
+(rule
+  (targets syntax_errors.messages)
+  (action
+    (run ocaml "-noinit" "-w" "+a" "maintain_syntax_error_messages.ml"))
+  (mode promote)
+  (deps (file "maintain_syntax_error_messages.ml")))
+
+; Compiles syntax_errors.messages into syntax_error_messages.ml
+(rule
+  (targets syntax_error_messages.ml)
+  (action
+    (with-stdout-to syntax_error_messages.ml
+      (run menhir "--compile-errors" "syntax_errors.messages" "syntax.mly")))
+  (deps (file "syntax_errors.messages")))

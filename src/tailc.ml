@@ -9,11 +9,11 @@ type command = CmdDefault
              | CmdDebug
 
 
-
 (* Compiler *)
 let rec tailc source output command =
   try
     let lexbuf = Sedlexing.Utf8.from_channel @@ open_in source in
+    Sedlexing.set_filename lexbuf source;
     Printf.printf "source: %s\noutput: %s\n" source output;
     match command with
       | CmdDefault ->
@@ -31,43 +31,21 @@ let rec tailc source output command =
 and compile lexbuf =
   parse lexbuf
 
+
 and parse lexbuf =
-  let rec parse_loop lexbuf context checkpoint =
-    match checkpoint with
-    | I.InputNeeded _ ->
-      let token = L.lexer context lexbuf in
-      let (start_pos, curr_pos) = Sedlexing.lexing_positions lexbuf in
-      let checkpoint = I.offer checkpoint (token, start_pos, curr_pos) in
-      Printf.printf "Passing token %s (line %d, column %d)\n"
-        (L.string_of_token token)
-        curr_pos.pos_lnum (curr_pos.pos_cnum - curr_pos.pos_bol + 1);
-      parse_loop lexbuf context checkpoint
-
-    | I.Shifting (_, _, request) ->
-      Printf.printf "Shifting\n";
-      let checkpoint = I.resume checkpoint in
-      parse_loop lexbuf context checkpoint
-
-    | I.AboutToReduce _ ->
-      Printf.printf "About to reduce\n";
-      let prev_cehckpoint = checkpoint in
-      let checkpoint = I.resume checkpoint in
-      parse_loop lexbuf context checkpoint
-
-    | I.HandlingError env ->
-      let (_, curr_pos) = Sedlexing.lexing_positions lexbuf in
-      Printf.fprintf stderr
-        "Syntax error at line %d\n"
-        curr_pos.pos_lnum
-
-    | I.Accepted v -> v |> Ast.string_of_expression |> print_endline
-
-    | I.Rejected -> Printf.printf "Input rejected by the parser\n"
-  in
   let context = Taillexer.new_context () in
+  let succeed v = Ast.string_of_expression v |> print_endline in
+  let fail lexbuf checkpoint =
+    match checkpoint with
+    | I.HandlingError env ->
+      P.print_syntax_error env lexbuf
+    | _ ->
+      Printf.fprintf stderr "Program rejected by the parser"
+  in
+  let supplier = Sedlexing.with_tokenizer (Taillexer.lexer context) lexbuf in
   let (start_position, _) = Sedlexing.lexing_positions lexbuf in
-  let start_checkpoint = Tailparser.Incremental.parse start_position in
-  parse_loop lexbuf context start_checkpoint
+  let start_checkpoint = P.Incremental.parse start_position in
+  I.loop_handle succeed (fail lexbuf) supplier start_checkpoint
 
 
 (* Command line arguments using cmdliner *)

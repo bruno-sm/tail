@@ -1,0 +1,850 @@
+parse: BLOCK_BEGIN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 40.
+##
+## block -> BLOCK_BEGIN . expression BLOCK_END [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## BLOCK_BEGIN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: BLOCK_BEGIN UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 64.
+##
+## block -> BLOCK_BEGIN expression . BLOCK_END [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE COMMA BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE COMMA BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## BLOCK_BEGIN expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: COMPLEMENT UNKNOWN_TOKEN
+##
+## Ends in an error in state: 18.
+##
+## type_expression -> COMPLEMENT . type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## COMPLEMENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TOKEN
+##
+## Ends in an error in state: 39.
+##
+## if_expression -> IF . expression THEN expression elif_expressions else_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## IF
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE SPACE
+##
+## Ends in an error in state: 68.
+##
+## if_expression -> IF expression . THEN expression elif_expressions else_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SEQUENCE COMMA ]
+## tuple_constructor -> expression . COMMA expression [ THEN SEQUENCE COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IF expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 69.
+##
+## if_expression -> IF expression THEN . expression elif_expressions else_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## IF expression THEN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TOKEN
+##
+## Ends in an error in state: 71.
+##
+## elif_expressions -> ELIF . expression THEN expression elif_expressions [ ELSE ]
+##
+## The known suffix of the stack is as follows:
+## ELIF
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE SPACE
+##
+## Ends in an error in state: 72.
+##
+## elif_expressions -> ELIF expression . THEN expression elif_expressions [ ELSE ]
+## sequence -> expression . SEQUENCE expression [ THEN SEQUENCE COMMA ]
+## tuple_constructor -> expression . COMMA expression [ THEN SEQUENCE COMMA ]
+##
+## The known suffix of the stack is as follows:
+## ELIF expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 73.
+##
+## elif_expressions -> ELIF expression THEN . expression elif_expressions [ ELSE ]
+##
+## The known suffix of the stack is as follows:
+## ELIF expression THEN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 74.
+##
+## elif_expressions -> ELIF expression THEN expression . elif_expressions [ ELSE ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE ELSE ELIF COMMA ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE ELSE ELIF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## ELIF expression THEN expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 79.
+##
+## else_expression -> ELSE expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## ELSE expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE UNKNOWN_TOKEN
+##
+## Ends in an error in state: 78.
+##
+## else_expression -> ELSE . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## ELSE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 70.
+##
+## if_expression -> IF expression THEN expression . elif_expressions else_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE ELSE ELIF COMMA ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE ELSE ELIF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IF expression THEN expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME ASSIGN STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 83.
+##
+## lambda -> LAMBDA NAME ASSIGN expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME ASSIGN expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME ASSIGN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 82.
+##
+## lambda -> LAMBDA NAME ASSIGN . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME ASSIGN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME COLON UNKNOWN_TOKEN
+##
+## Ends in an error in state: 35.
+##
+## lambda -> LAMBDA NAME COLON . type_expression ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME COLON
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME COLON UNKNOWN_TYPE ASSIGN STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 81.
+##
+## lambda -> LAMBDA NAME COLON type_expression ASSIGN expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME COLON type_expression ASSIGN expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME COLON UNKNOWN_TYPE ASSIGN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 37.
+##
+## lambda -> LAMBDA NAME COLON type_expression ASSIGN . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME COLON type_expression ASSIGN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME COLON UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 36.
+##
+## lambda -> LAMBDA NAME COLON type_expression . ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## type_expression -> type_expression . UNION type_expression [ UNION INTERSECTION COMMA ASSIGN ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION INTERSECTION COMMA ASSIGN ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION INTERSECTION COMMA ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION INTERSECTION COMMA ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME COLON type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA NAME UNKNOWN_TYPE
+##
+## Ends in an error in state: 34.
+##
+## lambda -> LAMBDA NAME . COLON type_expression ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## lambda -> LAMBDA NAME . ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA NAME
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LAMBDA UNKNOWN_TYPE
+##
+## Ends in an error in state: 33.
+##
+## lambda -> LAMBDA . NAME COLON type_expression ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## lambda -> LAMBDA . NAME ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LIST_TYPE OPEN_BRACKET UNKNOWN_TOKEN
+##
+## Ends in an error in state: 16.
+##
+## type_expression -> LIST_TYPE OPEN_BRACKET . type_expression CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## LIST_TYPE OPEN_BRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LIST_TYPE OPEN_BRACKET UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 21.
+##
+## type_expression -> type_expression . UNION type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> LIST_TYPE OPEN_BRACKET type_expression . CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+##
+## The known suffix of the stack is as follows:
+## LIST_TYPE OPEN_BRACKET type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: LIST_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 15.
+##
+## type_expression -> LIST_TYPE . [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> LIST_TYPE . OPEN_BRACKET type_expression CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## LIST_TYPE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: MATRIX_TYPE OPEN_BRACKET UNKNOWN_TOKEN
+##
+## Ends in an error in state: 14.
+##
+## type_expression -> MATRIX_TYPE OPEN_BRACKET . type_expression CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## MATRIX_TYPE OPEN_BRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: MATRIX_TYPE OPEN_BRACKET UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 31.
+##
+## type_expression -> type_expression . UNION type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+## type_expression -> MATRIX_TYPE OPEN_BRACKET type_expression . CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION INTERSECTION COMMA CLOSE_BRACKET ARROW ]
+##
+## The known suffix of the stack is as follows:
+## MATRIX_TYPE OPEN_BRACKET type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: MATRIX_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 13.
+##
+## type_expression -> MATRIX_TYPE . [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> MATRIX_TYPE . OPEN_BRACKET type_expression CLOSE_BRACKET [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## MATRIX_TYPE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME ASSIGN STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 89.
+##
+## assignment -> NAME ASSIGN expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## NAME ASSIGN expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME ASSIGN UNKNOWN_TOKEN
+##
+## Ends in an error in state: 88.
+##
+## assignment -> NAME ASSIGN . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## NAME ASSIGN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME COLON UNKNOWN_TOKEN
+##
+## Ends in an error in state: 86.
+##
+## declaration -> NAME COLON . type_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## NAME COLON
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME COLON UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 87.
+##
+## declaration -> NAME COLON type_expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## type_expression -> type_expression . UNION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+##
+## The known suffix of the stack is as follows:
+## NAME COLON type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME OPEN_PARENTHESES UNKNOWN_TOKEN
+##
+## Ends in an error in state: 12.
+##
+## function_call -> NAME OPEN_PARENTHESES . expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## NAME OPEN_PARENTHESES
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME OPEN_PARENTHESES UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 84.
+##
+## function_call -> NAME OPEN_PARENTHESES expression . CLOSE_PARENTHESES [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE COMMA CLOSE_PARENTHESES ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE COMMA CLOSE_PARENTHESES ]
+##
+## The known suffix of the stack is as follows:
+## NAME OPEN_PARENTHESES expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: NAME UNKNOWN_TYPE
+##
+## Ends in an error in state: 11.
+##
+## assignment -> NAME . ASSIGN expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## declaration -> NAME . COLON type_expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## function_call -> NAME . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## variable -> NAME . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## NAME
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_BRACKET UNKNOWN_TOKEN
+##
+## Ends in an error in state: 10.
+##
+## matrix_constructor -> OPEN_BRACKET . matrix_elements CLOSE_BRACKET [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## matrix_constructor -> OPEN_BRACKET . CLOSE_BRACKET [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## OPEN_BRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_BRACKET UNKNOWN_TYPE CLOSE_LIST
+##
+## Ends in an error in state: 96.
+##
+## matrix_elements -> element_list . SEQUENCE matrix_elements [ CLOSE_BRACKET ]
+## matrix_elements -> element_list . [ CLOSE_BRACKET ]
+##
+## The known suffix of the stack is as follows:
+## element_list
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+## In state 93, spurious reduction of production element_list -> expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_LIST UNKNOWN_TOKEN
+##
+## Ends in an error in state: 9.
+##
+## list_constructor -> OPEN_LIST . element_list CLOSE_LIST [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## list_constructor -> OPEN_LIST . CLOSE_LIST [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## OPEN_LIST
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_LIST UNKNOWN_TYPE CLOSE_BRACKET
+##
+## Ends in an error in state: 100.
+##
+## list_constructor -> OPEN_LIST element_list . CLOSE_LIST [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## OPEN_LIST element_list
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+## In state 93, spurious reduction of production element_list -> expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_LIST UNKNOWN_TYPE SPACE UNKNOWN_TOKEN
+##
+## Ends in an error in state: 94.
+##
+## element_list -> expression SPACE . element_list [ SEQUENCE CLOSE_LIST CLOSE_BRACKET ]
+##
+## The known suffix of the stack is as follows:
+## expression SPACE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_LIST UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 93.
+##
+## element_list -> expression . SPACE element_list [ SEQUENCE CLOSE_LIST CLOSE_BRACKET ]
+## element_list -> expression . [ SEQUENCE CLOSE_LIST CLOSE_BRACKET ]
+## sequence -> expression . SEQUENCE expression [ SPACE SEQUENCE COMMA CLOSE_LIST CLOSE_BRACKET ]
+## tuple_constructor -> expression . COMMA expression [ SPACE SEQUENCE COMMA CLOSE_LIST CLOSE_BRACKET ]
+##
+## The known suffix of the stack is as follows:
+## expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_PARENTHESES UNKNOWN_TOKEN
+##
+## Ends in an error in state: 8.
+##
+## expression -> OPEN_PARENTHESES . expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## OPEN_PARENTHESES
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: OPEN_PARENTHESES UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 102.
+##
+## expression -> OPEN_PARENTHESES expression . CLOSE_PARENTHESES [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE COMMA CLOSE_PARENTHESES ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE COMMA CLOSE_PARENTHESES ]
+##
+## The known suffix of the stack is as follows:
+## OPEN_PARENTHESES expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: STRING COMMA ATOM COMMA UNKNOWN_TOKEN
+##
+## Ends in an error in state: 46.
+##
+## tuple_constructor -> tuple_constructor COMMA . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## tuple_constructor COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: STRING COMMA ATOM UNKNOWN_TYPE
+##
+## Ends in an error in state: 45.
+##
+## tuple_constructor -> tuple_constructor . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## type_constructor -> tuple_constructor . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## tuple_constructor
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: STRING COMMA UNKNOWN_TOKEN
+##
+## Ends in an error in state: 57.
+##
+## tuple_constructor -> expression COMMA . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## expression COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TOKEN
+##
+## Ends in an error in state: 0.
+##
+## parse' -> . parse [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE ARROW UNKNOWN_TOKEN
+##
+## Ends in an error in state: 26.
+##
+## type_expression -> type_expression ARROW . type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression ARROW
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE ARROW UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 27.
+##
+## type_expression -> type_expression . UNION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression ARROW type_expression . [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression ARROW type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE COMMA UNKNOWN_TOKEN
+##
+## Ends in an error in state: 28.
+##
+## type_expression -> type_expression COMMA . type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE INTERSECTION UNKNOWN_TOKEN
+##
+## Ends in an error in state: 24.
+##
+## type_expression -> type_expression INTERSECTION . type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression INTERSECTION
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE INTERSECTION UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 25.
+##
+## type_expression -> type_expression . UNION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression INTERSECTION type_expression . [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression INTERSECTION type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE SEQUENCE ATOM SEQUENCE STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 56.
+##
+## sequence -> sequence SEQUENCE expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## sequence SEQUENCE expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE SEQUENCE ATOM SEQUENCE UNKNOWN_TOKEN
+##
+## Ends in an error in state: 49.
+##
+## sequence -> sequence SEQUENCE . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## sequence SEQUENCE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE SEQUENCE STRING UNKNOWN_TYPE
+##
+## Ends in an error in state: 66.
+##
+## sequence -> expression . SEQUENCE expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> expression SEQUENCE expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## tuple_constructor -> expression . COMMA expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## expression SEQUENCE expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE SEQUENCE UNKNOWN_TOKEN
+##
+## Ends in an error in state: 65.
+##
+## sequence -> expression SEQUENCE . expression [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+##
+## The known suffix of the stack is as follows:
+## expression SEQUENCE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE THEN
+##
+## Ends in an error in state: 105.
+##
+## parse -> expression . EOF [ # ]
+## sequence -> expression . SEQUENCE expression [ SEQUENCE EOF COMMA ]
+## tuple_constructor -> expression . COMMA expression [ SEQUENCE EOF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## expression
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expression -> type_expression 
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE UNION UNKNOWN_TOKEN
+##
+## Ends in an error in state: 22.
+##
+## type_expression -> type_expression UNION . type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression UNION
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE UNION UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 23.
+##
+## type_expression -> type_expression . UNION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression UNION type_expression . [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ASSIGN ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression UNION type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+parse: UNKNOWN_TYPE UNKNOWN_TYPE
+##
+## Ends in an error in state: 43.
+##
+## expression -> type_expression . [ THEN SPACE SEQUENCE EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## type_expression -> type_expression . UNION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . INTERSECTION type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . COMMA type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+## type_expression -> type_expression . ARROW type_expression [ UNION THEN SPACE SEQUENCE INTERSECTION EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ARROW ]
+##
+## The known suffix of the stack is as follows:
+## type_expression
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
