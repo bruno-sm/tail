@@ -92,11 +92,11 @@ and lexer context lexbuf =
 
     | "else" -> ELSE
 
-    | "|" -> UNION
+    | "or" -> UNION
 
-    | "&" -> INTERSECTION
+    | "and" -> INTERSECTION
 
-    | "-" -> COMPLEMENT
+    | "not" -> COMPLEMENT
 
     | "Int" -> INT_TYPE
 
@@ -129,6 +129,8 @@ and lexer context lexbuf =
     | "[" -> OPEN_BRACKET
 
     | "]" -> CLOSE_BRACKET
+
+    | "|" -> MATRIX_SEPARATOR
 
     | "\n" -> skip_breaklines context lexbuf
 

@@ -32,7 +32,6 @@
 %token <string> SPECIFIC_ATOM_TYPE
 %token LIST_TYPE
 %token MATRIX_TYPE
-/* Dummy token for give more precedence to sequences inside a matrix */
 %token MATRIX_SEPARATOR
 %token <int> UNIVERSE_TYPE
 %token UNKNOWN_TYPE
@@ -294,7 +293,7 @@ matrix_constructor:
 
 
 matrix_elements:
-  | l = element_list; SEQUENCE; m = matrix_elements %prec MATRIX_SEPARATOR
+  | l = element_list; MATRIX_SEPARATOR; option(MATRIX_SEPARATOR); m = matrix_elements
     { l::m }
 
   | l = element_list
@@ -303,7 +302,7 @@ matrix_elements:
 
 
 element_list:
-  | e = expression; COMMA; l = element_list
+  | e = expression; l = element_list
     { e::l }
 
   | e = expression
