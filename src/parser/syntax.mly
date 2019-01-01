@@ -41,7 +41,6 @@
 %token CLOSE_LIST
 %token OPEN_BRACKET
 %token CLOSE_BRACKET
-%token SPACE
 %token UNKNOWN_TOKEN
 %token EOF
 
@@ -70,7 +69,7 @@ expression:
     { Sequence(s) }
 
   | OPEN_PARENTHESES; e = expression; CLOSE_PARENTHESES
-    { Parenthesis(e) }
+    { Parentheses(e) }
 
   | b = block
     { b }
@@ -304,7 +303,7 @@ matrix_elements:
 
 
 element_list:
-  | e = expression; SPACE; l = element_list
+  | e = expression; COMMA; l = element_list
     { e::l }
 
   | e = expression

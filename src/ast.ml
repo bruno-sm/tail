@@ -56,7 +56,7 @@ let rec string_of_type_expression = function
 
 
 type expression = Sequence of expression list
-                | Parenthesis of expression
+                | Parentheses of expression
                 | Block of expression
                 | Variable of string
                 | Lambda of string * type_expression * expression
@@ -84,7 +84,7 @@ let rec string_of_expression = function
                          (List.map string_of_expression exp_list |>
                           List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
 
-  | Parenthesis e -> Printf.sprintf "Parenthesis\n\t| %s\n" @@ string_of_expression e
+  | Parentheses e -> Printf.sprintf "Parenthesis\n\t| %s\n" @@ string_of_expression e
 
   | Block e -> Printf.sprintf "Block\n\t| %s\n" @@ string_of_expression e
 

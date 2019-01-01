@@ -74,8 +74,8 @@ let print_syntax_error env lexbuf =
   let end_column_pos = end_pos.pos_cnum - end_pos.pos_bol + 1 in
   let line = nth_line start_pos.pos_lnum start_pos.pos_fname in
   Printf.fprintf stderr
-    "\n%s%sSyntax error%s%s:%s\n"
-    bold error_color reset bold reset;
+    "\n%s%sSyntax error%s%s (state %d):%s\n"
+    bold error_color reset bold state reset;
   Printf.fprintf stderr
     "%sIn %s %sline %d%s%s, %scolumn %d%s\n"
     bold start_pos.pos_fname

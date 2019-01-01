@@ -16,12 +16,7 @@ let rec tailc source output command =
     Sedlexing.set_filename lexbuf source;
     Printf.printf "source: %s\noutput: %s\n" source output;
     match command with
-      | CmdDefault ->
-        begin try
-          compile lexbuf
-        with
-        | Tailparser.Error -> Printf.printf "Tailparser error in %s" (Sedlexing.Utf8.lexeme lexbuf)
-        end
+      | CmdDefault -> compile lexbuf
 
       | CmdDebug -> Taillexer.show_lexing lexbuf
   with
