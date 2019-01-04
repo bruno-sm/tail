@@ -1,3 +1,11 @@
+; Parser library
+(library
+  (name tailparser)
+  (wrapped false)
+  (modules tailparser syntax syntax_error_messages)
+  (libraries menhirLib sedlex ast))
+
+
 (menhir
   (modules syntax)
   (flags "-v" "--explain" "--table"))

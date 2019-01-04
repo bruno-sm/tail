@@ -2,12 +2,26 @@
   (dev
     (flags (:standard -warn-error -A))))
 
+
+; Lexer library
+(library
+  (name taillexer)
+  (wrapped false)
+  (modules taillexer)
+  (libraries sedlex tailparser)
+  (preprocess (pps sedlex.ppx)))
+
+
+; Ast library
+(library
+  (name ast)
+  (wrapped false)
+  (modules ast))
+
+
 (executable
   (name tailc)
   (public_name tailc)
   (package tail)
-  (modules tailc ast syntax tailparser taillexer syntax_error_messages)
-  (libraries base cmdliner sedlex menhirLib)
-  (preprocess (pps sedlex.ppx)))
-
-(include_subdirs unqualified)
+  (modules tailc)
+  (libraries base cmdliner taillexer tailparser ast))

@@ -11,9 +11,10 @@ license: "GPL-3.0"
 depends: [
   "base"
   "cmdliner"
-  "dune" {build}
+  "dune" {>= "1.6.0"}
   "shexp"
   "menhir"
+  "alcotest"
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
