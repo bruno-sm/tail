@@ -60,7 +60,7 @@ type expression = Sequence of expression list
                 | Block of expression
                 | Variable of string
                 | Lambda of string * type_expression * expression
-                | FunctionCall of string * expression
+                | FunctionCall of expression * expression
                 | Declaration of string * type_expression
                 | Assignment of string * expression
                 | If of expression * expression *
@@ -95,9 +95,9 @@ let rec string_of_expression = function
                         (string_of_type_expression t)
                         (string_of_expression e)
 
-  | FunctionCall (name, arg) -> Printf.sprintf "FunctionCall(%s)\n\t| %s\n"
-                                name
-                                (string_of_expression arg)
+  | FunctionCall (funct, arg) -> Printf.sprintf "FunctionCall(%s)\n\t| %s\n"
+                                    (string_of_expression funct)
+                                    (string_of_expression arg)
 
   | Declaration (name, t) -> Printf.sprintf "Declaration(%s)\n\t| %s\n"
                              name

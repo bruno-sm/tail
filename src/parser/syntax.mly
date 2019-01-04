@@ -16,6 +16,7 @@
 %token <int> BLOCK_END
 %token ASSIGN
 %token COMMA
+%token SPACE
 /* Dummy token for give more precedence to commas declaring a tuple type */
 %token TYPE_COMMA
 %token IF
@@ -39,6 +40,7 @@
 %token OPEN_LIST
 %token CLOSE_LIST
 %token OPEN_BRACKET
+%token FUNCTION_CALL
 %token CLOSE_BRACKET
 %token UNKNOWN_TOKEN
 %token EOF
@@ -53,6 +55,7 @@
 %right ARROW
 %nonassoc COMPLEMENT
 %left TYPE_COMMA
+%nonassoc OPEN_PARENTHESES
 
 %start parse
 %type <Ast.expression> parse
@@ -64,9 +67,24 @@ parse:
 
 
 expression:
+  | e = basic_expression
+    { e }
+
   | s = sequence
     { Sequence(s) }
+;
 
+
+sequence:
+  | s = sequence; SEQUENCE; e = basic_expression
+    { e::s }
+
+  | e1 = basic_expression; SEQUENCE; e2 = basic_expression
+    { [e1; e2] }
+;
+
+
+basic_expression:
   | OPEN_PARENTHESES; e = expression; CLOSE_PARENTHESES
     { Parentheses(e) }
 
@@ -99,14 +117,6 @@ expression:
 ;
 
 
-sequence:
-  | s = sequence; SEQUENCE; e = expression
-    { e::s }
-
-  | e1 = expression; SEQUENCE; e2 = expression
-    { [e1; e2] }
-
-
 block:
   | BLOCK_BEGIN; e = expression; BLOCK_END
     { Block(e) }
@@ -114,17 +124,17 @@ block:
 
 
 lambda:
-  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; e = expression
+  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; e = basic_expression
     { Lambda(v, t, e) }
 
-  | LAMBDA; v = NAME; ASSIGN; e = expression
+  | LAMBDA; v = NAME; ASSIGN; e = basic_expression
     { Lambda(v, Unknown, e) }
 ;
 
 
 function_call:
-  | n = NAME; OPEN_PARENTHESES; arg = expression; CLOSE_PARENTHESES
-    { FunctionCall(n, arg) }
+  | f = basic_expression; OPEN_PARENTHESES; arg = expression; CLOSE_PARENTHESES
+    { FunctionCall(f, arg) }
 ;
 
 
@@ -135,7 +145,7 @@ declaration:
 
 
 assignment:
-  | n = NAME; ASSIGN;  e = expression
+  | n = NAME; ASSIGN;  e = basic_expression
     { Assignment(n, e) }
 ;
 
@@ -162,7 +172,7 @@ elif_expressions:
 
 
 else_expression:
-  | ELSE; do_else = expression
+  | ELSE; do_else = basic_expression
     { Else(do_else) }
 ;
 
@@ -264,12 +274,12 @@ atom_constructor:
 
 
 tuple_constructor:
-  | t = tuple_constructor; COMMA; e = expression
+  | t = tuple_constructor; COMMA; e = basic_expression
     { match t with
         | TupleLiteral(expressions) -> TupleLiteral(e::expressions)
         | _ -> TupleLiteral([e]) }
 
-  | e1 = expression; COMMA; e2 = expression
+  | e1 = basic_expression; COMMA; e2 = basic_expression
     { TupleLiteral([e1; e2]) }
 ;
 
@@ -302,7 +312,7 @@ matrix_elements:
 
 
 element_list:
-  | e = expression; l = element_list
+  | e = expression; SPACE; l = element_list
     { e::l }
 
   | e = expression

@@ -84,6 +84,8 @@ and lexer context lexbuf =
 
     | ',' -> COMMA
 
+    | ",," -> SPACE
+
     | "if" -> IF
 
     | "then" -> THEN
