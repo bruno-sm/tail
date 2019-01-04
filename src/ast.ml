@@ -79,75 +79,105 @@ type expression = Sequence of expression list
                 | MatrixLiteral of expression list list
 
 
-let rec string_of_expression = function
-  | Sequence exp_list -> Printf.sprintf "Sequence\n\t| %s\n"
-                         (List.map string_of_expression exp_list |>
-                          List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
+let rec string_of_expression ident = function
+  | Sequence exp_list -> Printf.sprintf "Sequence\n%s| %s\n"
+                         ident
+                         (List.map (string_of_expression (ident ^ " ")) exp_list |>
+                          List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "")
 
-  | Parentheses e -> Printf.sprintf "Parenthesis\n\t| %s\n" @@ string_of_expression e
+  | Parentheses e -> Printf.sprintf "Parenthesis\n%s| %s\n"
+                     ident
+                     (string_of_expression (ident ^ " ") e)
 
-  | Block e -> Printf.sprintf "Block\n\t| %s\n" @@ string_of_expression e
+  | Block e -> Printf.sprintf "Block\n%s| %s\n"
+               ident
+               (string_of_expression (ident ^ " ") e)
 
-  | Variable v -> Printf.sprintf "Variable\n\t| %s\n" v
+  | Variable v -> Printf.sprintf "Variable\n%s| %s\n" ident v
 
-  | Lambda (v, t, e) -> Printf.sprintf "Lambda(%s)\n\t| %s\n\t| %s\n"
+  | Lambda (v, t, e) -> Printf.sprintf "Lambda(%s)\n%s| %s\n%s| %s\n"
                         v
+                        ident
                         (string_of_type_expression t)
-                        (string_of_expression e)
+                        ident
+                        (string_of_expression (ident ^ " ") e)
 
-  | FunctionCall (funct, arg) -> Printf.sprintf "FunctionCall(%s)\n\t| %s\n"
-                                    (string_of_expression funct)
-                                    (string_of_expression arg)
+  | FunctionCall (funct, arg) -> Printf.sprintf "FunctionCall\n%s| %s\n%s| %s\n"
+                                 ident
+                                 (string_of_expression (ident ^ " ") funct)
+                                 ident
+                                 (string_of_expression (ident ^ " ") arg)
 
-  | Declaration (name, t) -> Printf.sprintf "Declaration(%s)\n\t| %s\n"
+  | Declaration (name, t) -> Printf.sprintf "Declaration(%s)\n%s| %s\n"
                              name
+                             ident
                              (string_of_type_expression t)
 
-  | Assignment (name, e) -> Printf.sprintf "Assignment(%s)\n\t| %s\n"
+  | Assignment (name, e) -> Printf.sprintf "Assignment(%s)\n%s| %s\n"
                             name
-                            (string_of_expression e)
+                            ident
+                            (string_of_expression (ident ^ " ") e)
 
-  | If (cond, do_if, [], do_else) -> Printf.sprintf "If\n\t| %s\n\t| %s\n\t| %s\n"
-                                    (string_of_expression cond)
-                                    (string_of_expression do_if)
-                                    (string_of_expression do_else)
+  | If (cond, do_if, [], do_else) -> Printf.sprintf "If\n%s| %s\n%s| %s\n%s| %s\n"
+                                    ident
+                                    (string_of_expression (ident ^ " ") cond)
+                                    ident
+                                    (string_of_expression (ident ^ " ") do_if)
+                                    ident
+                                    (string_of_expression (ident ^ " ") do_else)
 
-  | If (cond, do_if, elif_list, do_else) -> Printf.sprintf "If\n\t| %s\n\t| %s\n\t| %s \n\t| %s\n"
-                                            (string_of_expression cond)
-                                            (string_of_expression do_if)
-                                            (List.map string_of_expression elif_list |>
-                                             List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
-                                            (string_of_expression do_else)
+  | If (cond, do_if, elif_list, do_else) -> Printf.sprintf "If\n%s| %s\n%s| %s\n%s| %s \n%s| %s\n"
+                                            ident
+                                            (string_of_expression (ident ^ " ") cond)
+                                            ident
+                                            (string_of_expression (ident ^ " ") do_if)
+                                            ident
+                                            (List.map (string_of_expression (ident ^ " ")) elif_list |>
+                                             List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "")
+                                            ident
+                                            (string_of_expression (ident ^ " ") do_else)
 
-  | Elif (cond, do_if) -> Printf.sprintf "Elif\n\t| %s\n\t| %s\n"
-                          (string_of_expression cond)
-                          (string_of_expression do_if)
+  | Elif (cond, do_if) -> Printf.sprintf "Elif\n%s| %s\n%s| %s\n"
+                          ident
+                          (string_of_expression (ident ^ " ") cond)
+                          ident
+                          (string_of_expression (ident ^ " ") do_if)
 
-  | Else do_else -> Printf.sprintf "Else\n\t| %s\n" @@ string_of_expression do_else
+  | Else do_else -> Printf.sprintf "Else\n%s| %s\n"
+                    ident
+                    (string_of_expression (ident ^ " ") do_else)
 
-  | Type t -> Printf.sprintf "Type\n\t| %s\n" @@ string_of_type_expression t
+  | Type t -> Printf.sprintf "Type\n%s| %s\n"
+              ident
+              (string_of_type_expression t)
 
-  | IntLiteral n -> Printf.sprintf "IntLiteral\n\t| %d\n" n
+  | IntLiteral n -> Printf.sprintf "IntLiteral\n%s| %d\n" ident n
 
-  | RealLiteral x -> Printf.sprintf "RealLiteral\n\t| %f\n" x
+  | RealLiteral x -> Printf.sprintf "RealLiteral\n%s| %f\n" ident x
 
-  | StringLiteral s -> Printf.sprintf "StringLiteral\n\t| %s\n" s
+  | StringLiteral s -> Printf.sprintf "StringLiteral\n%s| %s\n" ident s
 
-  | AtomLiteral a -> Printf.sprintf "AtomLiteral\n\t| %s\n" a
+  | AtomLiteral a -> Printf.sprintf "AtomLiteral\n%s| %s\n" ident a
 
-  | BoolLiteral true -> "BoolLiteral\n\t| true\n"
+  | BoolLiteral true -> Printf.sprintf "BoolLiteral\n%s| True\n" ident
 
-  | BoolLiteral false -> "BoolLiteral\n\t| false\n"
+  | BoolLiteral false ->  Printf.sprintf "BoolLiteral\n%s| False\n" ident
 
-  | TupleLiteral exp_list -> Printf.sprintf "TupleLiteral\n\t| %s\n"
-                             (List.map string_of_expression exp_list |>
-                              List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
+  | TupleLiteral exp_list -> Printf.sprintf "TupleLiteral\n%s| %s\n"
+                             ident
+                             (List.map (string_of_expression (ident ^ " ")) exp_list |>
+                              List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "")
 
-  | ListLiteral exp_list -> Printf.sprintf "ListLiteral\n\t| %s\n"
-                            (List.map string_of_expression exp_list |>
-                             List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
+  | ListLiteral exp_list -> Printf.sprintf "ListLiteral\n%s| %s\n"
+                            ident
+                            (List.map (string_of_expression (ident ^ " ")) exp_list |>
+                             List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "")
 
-  | MatrixLiteral exp_matrix -> Printf.sprintf "MatrixLiteral\n\t| %s\n"
-                                (List.map (List.map string_of_expression) exp_matrix |>
-                                 List.map (List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "") |>
-                                 List.fold_left (fun s1 s2 -> s1 ^ "\n\t| " ^ s2) "")
+  | MatrixLiteral exp_matrix -> Printf.sprintf "MatrixLiteral\n%s| %s\n"
+                                ident
+                                (List.map (List.map (string_of_expression (ident ^ " "))) exp_matrix |>
+                                 List.map (List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "") |>
+                                 List.fold_left (fun s1 s2 -> s1 ^ "\n" ^ ident ^ "| " ^ s2) "")
+
+
+let string_of_expression exp = string_of_expression "" exp

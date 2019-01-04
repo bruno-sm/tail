@@ -12,7 +12,7 @@ parse: BLOCK_BEGIN UNKNOWN_TOKEN
 
 parse: BLOCK_BEGIN UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 72.
+## Ends in an error in state: 71.
 ##
 ## block -> BLOCK_BEGIN expression . BLOCK_END [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -24,7 +24,7 @@ parse: BLOCK_BEGIN UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -55,7 +55,7 @@ parse: IF UNKNOWN_TOKEN
 
 parse: IF UNKNOWN_TYPE SPACE
 ##
-## Ends in an error in state: 74.
+## Ends in an error in state: 73.
 ##
 ## if_expression -> IF expression . THEN expression elif_expressions else_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -67,14 +67,14 @@ parse: IF UNKNOWN_TYPE SPACE
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 75.
+## Ends in an error in state: 74.
 ##
 ## if_expression -> IF expression THEN . expression elif_expressions else_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -86,7 +86,7 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 77.
+## Ends in an error in state: 76.
 ##
 ## elif_expressions -> ELIF . expression THEN expression elif_expressions [ ELSE ]
 ##
@@ -98,7 +98,7 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TOKEN
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE SPACE
 ##
-## Ends in an error in state: 78.
+## Ends in an error in state: 77.
 ##
 ## elif_expressions -> ELIF expression . THEN expression elif_expressions [ ELSE ]
 ##
@@ -110,14 +110,14 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE SPACE
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 79.
+## Ends in an error in state: 78.
 ##
 ## elif_expressions -> ELIF expression THEN . expression elif_expressions [ ELSE ]
 ##
@@ -129,7 +129,7 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TOKEN
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 80.
+## Ends in an error in state: 79.
 ##
 ## elif_expressions -> ELIF expression THEN expression . elif_expressions [ ELSE ]
 ##
@@ -141,14 +141,14 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELIF UNKNOWN_TYPE THEN UNKNOWN_TYPE THE
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 85.
+## Ends in an error in state: 84.
 ##
 ## else_expression -> ELSE basic_expression . [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
@@ -162,7 +162,7 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE STRING UNKNOWN_TYPE
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 84.
+## Ends in an error in state: 83.
 ##
 ## else_expression -> ELSE . basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -174,7 +174,7 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE ELSE UNKNOWN_TOKEN
 
 parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 76.
+## Ends in an error in state: 75.
 ##
 ## if_expression -> IF expression THEN expression . elif_expressions else_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -186,14 +186,14 @@ parse: IF UNKNOWN_TYPE THEN UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: LAMBDA NAME ASSIGN STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 89.
+## Ends in an error in state: 88.
 ##
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## lambda -> LAMBDA NAME ASSIGN basic_expression . [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
@@ -207,7 +207,7 @@ parse: LAMBDA NAME ASSIGN STRING UNKNOWN_TYPE
 
 parse: LAMBDA NAME ASSIGN UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 88.
+## Ends in an error in state: 87.
 ##
 ## lambda -> LAMBDA NAME ASSIGN . basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -231,7 +231,7 @@ parse: LAMBDA NAME COLON UNKNOWN_TOKEN
 
 parse: LAMBDA NAME COLON UNKNOWN_TYPE ASSIGN STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 87.
+## Ends in an error in state: 86.
 ##
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## lambda -> LAMBDA NAME COLON type_expression ASSIGN basic_expression . [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
@@ -381,7 +381,7 @@ parse: MATRIX_TYPE UNKNOWN_TYPE
 
 parse: NAME ASSIGN STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 90.
+## Ends in an error in state: 89.
 ##
 ## assignment -> NAME ASSIGN basic_expression . [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
@@ -462,7 +462,7 @@ parse: OPEN_BRACKET UNKNOWN_TOKEN
 
 parse: OPEN_BRACKET UNKNOWN_TYPE CLOSE_LIST
 ##
-## Ends in an error in state: 97.
+## Ends in an error in state: 96.
 ##
 ## matrix_elements -> element_list . MATRIX_SEPARATOR option(MATRIX_SEPARATOR) matrix_elements [ CLOSE_BRACKET ]
 ## matrix_elements -> element_list . [ CLOSE_BRACKET ]
@@ -475,15 +475,15 @@ parse: OPEN_BRACKET UNKNOWN_TYPE CLOSE_LIST
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
-## In state 94, spurious reduction of production element_list -> expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
+## In state 93, spurious reduction of production element_list -> expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: OPEN_BRACKET UNKNOWN_TYPE MATRIX_SEPARATOR MATRIX_SEPARATOR ASSIGN
 ##
-## Ends in an error in state: 100.
+## Ends in an error in state: 99.
 ##
 ## matrix_elements -> element_list MATRIX_SEPARATOR option(MATRIX_SEPARATOR) . matrix_elements [ CLOSE_BRACKET ]
 ##
@@ -495,7 +495,7 @@ parse: OPEN_BRACKET UNKNOWN_TYPE MATRIX_SEPARATOR MATRIX_SEPARATOR ASSIGN
 
 parse: OPEN_BRACKET UNKNOWN_TYPE MATRIX_SEPARATOR UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 98.
+## Ends in an error in state: 97.
 ##
 ## matrix_elements -> element_list MATRIX_SEPARATOR . option(MATRIX_SEPARATOR) matrix_elements [ CLOSE_BRACKET ]
 ##
@@ -520,7 +520,7 @@ parse: OPEN_LIST UNKNOWN_TOKEN
 
 parse: OPEN_LIST UNKNOWN_TYPE MATRIX_SEPARATOR
 ##
-## Ends in an error in state: 103.
+## Ends in an error in state: 102.
 ##
 ## list_constructor -> OPEN_LIST element_list . CLOSE_LIST [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -532,15 +532,15 @@ parse: OPEN_LIST UNKNOWN_TYPE MATRIX_SEPARATOR
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
-## In state 94, spurious reduction of production element_list -> expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
+## In state 93, spurious reduction of production element_list -> expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: OPEN_LIST UNKNOWN_TYPE SPACE UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 95.
+## Ends in an error in state: 94.
 ##
 ## element_list -> expression SPACE . element_list [ MATRIX_SEPARATOR CLOSE_LIST CLOSE_BRACKET ]
 ##
@@ -552,7 +552,7 @@ parse: OPEN_LIST UNKNOWN_TYPE SPACE UNKNOWN_TOKEN
 
 parse: OPEN_LIST UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 94.
+## Ends in an error in state: 93.
 ##
 ## element_list -> expression . SPACE element_list [ MATRIX_SEPARATOR CLOSE_LIST CLOSE_BRACKET ]
 ## element_list -> expression . [ MATRIX_SEPARATOR CLOSE_LIST CLOSE_BRACKET ]
@@ -565,7 +565,7 @@ parse: OPEN_LIST UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -584,7 +584,7 @@ parse: OPEN_PARENTHESES UNKNOWN_TOKEN
 
 parse: OPEN_PARENTHESES UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 105.
+## Ends in an error in state: 104.
 ##
 ## basic_expression -> OPEN_PARENTHESES expression . CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -596,7 +596,7 @@ parse: OPEN_PARENTHESES UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -629,7 +629,7 @@ parse: STRING COMMA ATOM COMMA UNKNOWN_TOKEN
 
 parse: STRING COMMA STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 64.
+## Ends in an error in state: 68.
 ##
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## tuple_constructor -> basic_expression . COMMA basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
@@ -643,7 +643,7 @@ parse: STRING COMMA STRING UNKNOWN_TYPE
 
 parse: STRING COMMA UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 63.
+## Ends in an error in state: 67.
 ##
 ## tuple_constructor -> basic_expression COMMA . basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -655,11 +655,12 @@ parse: STRING COMMA UNKNOWN_TOKEN
 
 parse: STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 69.
+## Ends in an error in state: 63.
 ##
 ## expression -> basic_expression . [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-## sequence -> basic_expression . SEQUENCE basic_expression [ THEN SPACE SEQUENCE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression . SEQUENCE sequence [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression . SEQUENCE basic_expression [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## tuple_constructor -> basic_expression . COMMA basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
 ## The known suffix of the stack is as follows:
@@ -762,7 +763,7 @@ parse: UNKNOWN_TYPE OPEN_PARENTHESES UNKNOWN_TOKEN
 
 parse: UNKNOWN_TYPE OPEN_PARENTHESES UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 67.
+## Ends in an error in state: 61.
 ##
 ## function_call -> basic_expression OPEN_PARENTHESES expression . CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
@@ -774,43 +775,19 @@ parse: UNKNOWN_TYPE OPEN_PARENTHESES UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-parse: UNKNOWN_TYPE SEQUENCE ATOM SEQUENCE STRING UNKNOWN_TYPE
-##
-## Ends in an error in state: 62.
-##
-## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-## sequence -> sequence SEQUENCE basic_expression . [ THEN SPACE SEQUENCE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-## tuple_constructor -> basic_expression . COMMA basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-##
-## The known suffix of the stack is as follows:
-## sequence SEQUENCE basic_expression
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-parse: UNKNOWN_TYPE SEQUENCE ATOM SEQUENCE UNKNOWN_TOKEN
-##
-## Ends in an error in state: 61.
-##
-## sequence -> sequence SEQUENCE . basic_expression [ THEN SPACE SEQUENCE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-##
-## The known suffix of the stack is as follows:
-## sequence SEQUENCE
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 parse: UNKNOWN_TYPE SEQUENCE STRING UNKNOWN_TYPE
 ##
-## Ends in an error in state: 71.
+## Ends in an error in state: 66.
 ##
 ## function_call -> basic_expression . OPEN_PARENTHESES expression CLOSE_PARENTHESES [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
-## sequence -> basic_expression SEQUENCE basic_expression . [ THEN SPACE SEQUENCE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression . SEQUENCE sequence [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression . SEQUENCE basic_expression [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression SEQUENCE basic_expression . [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ## tuple_constructor -> basic_expression . COMMA basic_expression [ THEN SPACE SEQUENCE OPEN_PARENTHESES MATRIX_SEPARATOR EOF ELSE ELIF COMMA CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
 ## The known suffix of the stack is as follows:
@@ -821,9 +798,10 @@ parse: UNKNOWN_TYPE SEQUENCE STRING UNKNOWN_TYPE
 
 parse: UNKNOWN_TYPE SEQUENCE UNKNOWN_TOKEN
 ##
-## Ends in an error in state: 70.
+## Ends in an error in state: 64.
 ##
-## sequence -> basic_expression SEQUENCE . basic_expression [ THEN SPACE SEQUENCE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression SEQUENCE . sequence [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
+## sequence -> basic_expression SEQUENCE . basic_expression [ THEN SPACE MATRIX_SEPARATOR EOF ELSE ELIF CLOSE_PARENTHESES CLOSE_LIST CLOSE_BRACKET BLOCK_END ]
 ##
 ## The known suffix of the stack is as follows:
 ## basic_expression SEQUENCE
@@ -833,7 +811,7 @@ parse: UNKNOWN_TYPE SEQUENCE UNKNOWN_TOKEN
 
 parse: UNKNOWN_TYPE THEN
 ##
-## Ends in an error in state: 108.
+## Ends in an error in state: 107.
 ##
 ## parse -> expression . EOF [ # ]
 ##
@@ -845,7 +823,7 @@ parse: UNKNOWN_TYPE THEN
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 45, spurious reduction of production basic_expression -> type_expression 
-## In state 69, spurious reduction of production expression -> basic_expression 
+## In state 63, spurious reduction of production expression -> basic_expression 
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

@@ -76,7 +76,7 @@ expression:
 
 
 sequence:
-  | s = sequence; SEQUENCE; e = basic_expression
+  | e = basic_expression; SEQUENCE; s = sequence
     { e::s }
 
   | e1 = basic_expression; SEQUENCE; e2 = basic_expression
