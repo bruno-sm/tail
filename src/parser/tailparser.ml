@@ -7,6 +7,7 @@ let string_of_token = function
   | NAME n -> Printf.sprintf "NAME(%s)" n
   | ATOM a -> Printf.sprintf "ATOM(%s)" a
   | SEQUENCE -> Printf.sprintf "SEQUENCE"
+  | NEWLINE -> Printf.sprintf "NEWLINE"
   | OPEN_PARENTHESES -> Printf.sprintf "OPEN_PARENTHESES"
   | CLOSE_PARENTHESES -> Printf.sprintf "CLOSE_PARENTHESES"
   | LAMBDA -> Printf.sprintf "LAMBDA"
@@ -41,6 +42,43 @@ let string_of_token = function
   | _ -> Printf.sprintf "Other"
 
 
+
+module I = MenhirInterpreter
+
+(* Custom loop_handle_undo for finner error handling *)
+let loop_handle_undo succed fail supplier checkpoint =
+  let rec loop prev_checkpoint current_checkpoint last_token =
+    match current_checkpoint with
+    | I.InputNeeded _ ->
+      let (token, start_pos, end_pos) = supplier () in
+      let prev_checkpoint = current_checkpoint in
+      let current_checkpoint = I.offer current_checkpoint (token, start_pos, end_pos) in
+      Printf.printf "Passing token %s (line %d, column %d)\n"
+        (string_of_token token)
+        start_pos.pos_lnum (start_pos.pos_cnum - start_pos.pos_bol + 1);
+      loop prev_checkpoint current_checkpoint token
+
+    | I.Shifting (_, _, _) ->
+      Printf.printf "Shifting\n";
+      let prev_checkpoint = current_checkpoint in
+      let current_checkpoint = I.resume current_checkpoint in
+      loop prev_checkpoint current_checkpoint UNKNOWN_TOKEN
+
+    | I.AboutToReduce _ ->
+      Printf.printf "About to reduce\n";
+      let prev_cehckpoint = checkpoint in
+      let current_checkpoint = I.resume current_checkpoint in
+      loop prev_checkpoint current_checkpoint UNKNOWN_TOKEN
+
+    | I.HandlingError _ -> fail prev_checkpoint current_checkpoint last_token
+
+    | I.Accepted v -> succed v
+
+    | I.Rejected -> fail prev_checkpoint current_checkpoint last_token
+  in
+  loop checkpoint checkpoint UNKNOWN_TOKEN
+
+
 (* Functions for read the nth line of a file *)
 let input_line_opt ic =
  try Some (input_line ic)
@@ -63,6 +101,7 @@ let nth_line n filename =
  aux 1
 
 
+(* Prints pretty error messages *)
 let print_syntax_error env lexbuf =
   let error_color = "\027[38;2;231;29;54m" in
   let position_color = "\027[38;2;0;159;183m" in

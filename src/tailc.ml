@@ -29,18 +29,22 @@ and compile lexbuf =
 
 and parse lexbuf =
   let context = Taillexer.new_context () in
-  let succeed v = Ast.string_of_expression v |> print_endline in
-  let fail lexbuf checkpoint =
-    match checkpoint with
-    | I.HandlingError env ->
-      P.print_syntax_error env lexbuf
-    | _ ->
-      Printf.fprintf stderr "Program rejected by the parser"
-  in
   let supplier = Sedlexing.with_tokenizer (Taillexer.lexer context) lexbuf in
+  let succeed v = Ast.string_of_expression v |> print_endline in
+  let rec fail lexbuf prev_checkpoint curr_checkpoint last_token =
+    match curr_checkpoint with
+    | I.HandlingError env ->
+      if last_token = P.NEWLINE then begin
+        print_endline "Ignoring newline error";
+        P.loop_handle_undo succeed (fail lexbuf) supplier prev_checkpoint
+      end else
+        P.print_syntax_error env lexbuf
+
+    | _ -> Printf.fprintf stderr "Program rejected by the parser"
+  in
   let (start_position, _) = Sedlexing.lexing_positions lexbuf in
   let start_checkpoint = P.Incremental.parse start_position in
-  I.loop_handle succeed (fail lexbuf) supplier start_checkpoint
+  P.loop_handle_undo succeed (fail lexbuf) supplier start_checkpoint
 
 
 (* Command line arguments using cmdliner *)

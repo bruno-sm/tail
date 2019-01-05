@@ -8,6 +8,7 @@
 %token <string> STRING
 %token <string> ATOM
 %token SEQUENCE
+%token NEWLINE
 %token OPEN_PARENTHESES
 %token CLOSE_PARENTHESES
 %token LAMBDA
@@ -40,13 +41,13 @@
 %token OPEN_LIST
 %token CLOSE_LIST
 %token OPEN_BRACKET
-%token FUNCTION_CALL
 %token CLOSE_BRACKET
 %token UNKNOWN_TOKEN
 %token EOF
 
 %nonassoc ELSE
 %left SEQUENCE
+%left NEWLINE
 %right ASSIGN
 %nonassoc COLON
 %left COMMA
@@ -62,31 +63,30 @@
 %%
 
 parse:
-  | e = expression EOF  { e }
-;
-
-
-expression:
-  | e = basic_expression
-    { e }
-
-  | s = sequence
-    { Sequence(s) }
+  | NEWLINE?; e = sequence; EOF  { e }
 ;
 
 
 sequence:
-  | e = basic_expression; SEQUENCE; s = sequence
-    { e::s }
+  | e = basic_expression; sequence_op; s = sequence
+    { match s with
+      | Sequence l -> Sequence (e::l)
+      | _ -> Sequence []
+    }
 
-  | e1 = basic_expression; SEQUENCE; e2 = basic_expression
-    { [e1; e2] }
+  | e1 = basic_expression; sequence_op?
+    { Sequence [e1] }
 ;
 
 
+%inline sequence_op:
+  | SEQUENCE  {}
+  | NEWLINE {}
+
+
 basic_expression:
-  | OPEN_PARENTHESES; e = expression; CLOSE_PARENTHESES
-    { Parentheses(e) }
+  | OPEN_PARENTHESES; s = sequence; CLOSE_PARENTHESES
+    { Parentheses(s) }
 
   | b = block
     { b }
@@ -118,8 +118,8 @@ basic_expression:
 
 
 block:
-  | BLOCK_BEGIN; e = expression; BLOCK_END
-    { Block(e) }
+  | BLOCK_BEGIN; s = sequence; BLOCK_END
+    { Block(s) }
 ;
 
 
@@ -133,7 +133,7 @@ lambda:
 
 
 function_call:
-  | f = basic_expression; OPEN_PARENTHESES; arg = expression; CLOSE_PARENTHESES
+  | f = basic_expression; OPEN_PARENTHESES; arg = sequence; CLOSE_PARENTHESES
     { FunctionCall(f, arg) }
 ;
 
@@ -145,7 +145,7 @@ declaration:
 
 
 assignment:
-  | n = NAME; ASSIGN;  e = basic_expression
+  | n = NAME; ASSIGN; e = basic_expression
     { Assignment(n, e) }
 ;
 
@@ -157,13 +157,13 @@ variable:
 
 
 if_expression:
-  | IF; cond = expression; THEN; do_if = expression; do_elif = elif_expressions; do_else = else_expression
+  | IF; cond = sequence; THEN; do_if = sequence; do_elif = elif_expressions; do_else = else_expression
     { If(cond, do_if, do_elif, do_else) }
 ;
 
 
 elif_expressions:
-  | ELIF; cond = expression; THEN; do_if = expression; elifs = elif_expressions
+  | ELIF; cond = sequence; THEN; do_if = sequence; elifs = elif_expressions
     { Elif(cond, do_if)::elifs }
 
   | epsilon
@@ -312,10 +312,10 @@ matrix_elements:
 
 
 element_list:
-  | e = expression; SPACE; l = element_list
+  | e = basic_expression; SPACE; l = element_list
     { e::l }
 
-  | e = expression
+  | e = basic_expression
     { [e] }
 ;
 

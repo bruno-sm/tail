@@ -42,7 +42,7 @@ let rec skip_breaklines context lexbuf =
 
     | eof -> lexer context lexbuf
 
-    | _ -> context.check_identation <- true; lexer context lexbuf
+    | _ -> context.check_identation <- true; NEWLINE
 
 
 and lexer context lexbuf =
@@ -69,6 +69,7 @@ and lexer context lexbuf =
                    else if ident_diff < 0 then
                     let token_list = List.init ~-ident_diff (fun _ -> BLOCK_END) in
                     context.buffer <- context.buffer @ token_list;
+                    context.buffer <- context.buffer @ [NEWLINE];
                     lexer context lexbuf
                    else lexer context lexbuf
 
