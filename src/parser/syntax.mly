@@ -12,8 +12,8 @@
 %token CLOSE_PARENTHESES
 %token LAMBDA
 %token COLON
-%token <int> BLOCK_BEGIN
-%token <int> BLOCK_END
+%token BLOCK_BEGIN
+%token BLOCK_END
 %token ASSIGN
 %token COMMA
 %token SPACE

@@ -25,10 +25,14 @@ let universe_type = [%sedlex.regexp? "U", number]
 type context = {
   mutable token_number : int;
   mutable check_identation : bool;
-  mutable ident_depth : int
+  mutable ident_depth : int;
+  mutable buffer : token list
 }
 
-let new_context () = {token_number = 0; check_identation = true; ident_depth = 0}
+let new_context () = {token_number = 0;
+                      check_identation = true;
+                      ident_depth = 0;
+                      buffer = []}
 
 
 (* This function is called after finding a breakline *)
@@ -42,23 +46,32 @@ let rec skip_breaklines context lexbuf =
 
 
 and lexer context lexbuf =
-  (* Ignores initial breaklines *)
-  if context.token_number = 0 then
-    match%sedlex lexbuf with
-    | Star (Sub (white_space, "\t")) -> ()
-    | _ -> ()
-  else ();
+  (* Empties the buffer before scan new tokens *)
+  if context.buffer != [] then begin
+    let token = List.hd context.buffer in
+    context.buffer <- List.tl context.buffer;
+    token
+  end else
 
   (* Checks the identation level *)
   if context.check_identation then begin
     context.check_identation <- false;
     match%sedlex lexbuf with
+    | Sub (white_space, "\t") -> skip_breaklines context lexbuf
+
     | Star "\t" -> let ident_depth = String.length (Utf8.lexeme lexbuf) in
                    let ident_diff = ident_depth - context.ident_depth in
                    context.ident_depth <- ident_depth;
-                   if ident_diff > 0 then BLOCK_BEGIN ident_diff
-                   else if ident_diff < 0 then BLOCK_END ident_diff
+                   if ident_diff > 0 then
+                    let token_list = List.init ident_diff (fun _ -> BLOCK_BEGIN) in
+                    context.buffer <- context.buffer @ token_list;
+                    lexer context lexbuf
+                   else if ident_diff < 0 then
+                    let token_list = List.init ~-ident_diff (fun _ -> BLOCK_END) in
+                    context.buffer <- context.buffer @ token_list;
+                    lexer context lexbuf
                    else lexer context lexbuf
+
     | _ -> lexer context lexbuf
   end else
 
@@ -142,8 +155,10 @@ and lexer context lexbuf =
 
     | eof -> if context.ident_depth > 0 then
               let ident_diff = -context.ident_depth in
+              let token_list = List.init ~-ident_diff (fun _ -> BLOCK_END) in
               context.ident_depth <- 0;
-              BLOCK_END ident_diff
+              context.buffer <- context.buffer @ token_list;
+              lexer context lexbuf
              else EOF
 
     | any -> UNKNOWN_TOKEN

@@ -11,8 +11,8 @@ let string_of_token = function
   | CLOSE_PARENTHESES -> Printf.sprintf "CLOSE_PARENTHESES"
   | LAMBDA -> Printf.sprintf "LAMBDA"
   | COLON -> Printf.sprintf "COLON"
-  | BLOCK_BEGIN t -> Printf.sprintf "BLOCK_BEGIN(%d)" t
-  | BLOCK_END t -> Printf.sprintf "BLOCK_END(%d)" t
+  | BLOCK_BEGIN -> Printf.sprintf "BLOCK_BEGIN"
+  | BLOCK_END -> Printf.sprintf "BLOCK_END"
   | ASSIGN -> Printf.sprintf "ASSIGN"
   | COMMA -> Printf.sprintf "COMMA"
   | IF -> Printf.sprintf "IF"
