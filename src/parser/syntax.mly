@@ -4,6 +4,10 @@
 
 %token <int> INT_NUMBER
 %token <float> REAL_NUMBER
+%token FRACTION
+%token I
+%token PLUS
+%token MINUS
 %token <string> NAME
 %token <string> STRING
 %token <string> ATOM
@@ -17,9 +21,12 @@
 %token BLOCK_END
 %token ASSIGN
 %token COMMA
+%token POINT
 %token SPACE
 /* Dummy token for give more precedence to commas declaring a tuple type */
 %token TYPE_COMMA
+%token TRUE
+%token FALSE
 %token IF
 %token THEN
 %token ELIF
@@ -124,10 +131,10 @@ block:
 
 
 lambda:
-  | LAMBDA; v = NAME; COLON; t = type_expression; ASSIGN; e = basic_expression
+  | LAMBDA; v = NAME; COLON; t = type_expression; POINT; e = basic_expression
     { Lambda(v, t, e) }
 
-  | LAMBDA; v = NAME; ASSIGN; e = basic_expression
+  | LAMBDA; v = NAME; POINT; e = basic_expression
     { Lambda(v, Unknown, e) }
 ;
 
@@ -235,6 +242,9 @@ type_constructor:
   | c = number_constructor
     { c }
 
+  | c = bool_constructor
+    { c }
+
   | c = string_constructor
     { c }
 
@@ -258,6 +268,44 @@ number_constructor:
 
   | n = REAL_NUMBER
     { RealLiteral(n) }
+
+  | p = INT_NUMBER; FRACTION; q = INT_NUMBER
+    { RationalLiteral(p, q) }
+
+  | b = REAL_NUMBER; I
+    { ComplexLiteral(0.0, b) }
+
+  | a = INT_NUMBER; PLUS; b = INT_NUMBER; I
+    { ComplexLiteral(float_of_int a, float_of_int b) }
+
+  | a = INT_NUMBER; MINUS; b = INT_NUMBER; I
+    { ComplexLiteral(float_of_int a, float_of_int (-b)) }
+
+  | a = REAL_NUMBER; PLUS; b = INT_NUMBER; I
+    { ComplexLiteral(a, float_of_int b) }
+
+  | a = REAL_NUMBER; MINUS; b = INT_NUMBER; I
+    { ComplexLiteral(a, float_of_int (-b)) }
+
+  | a = INT_NUMBER; PLUS; b = REAL_NUMBER; I
+    { ComplexLiteral(float_of_int a, b) }
+
+  | a = INT_NUMBER; MINUS; b = REAL_NUMBER; I
+    { ComplexLiteral(float_of_int a, -.b) }
+
+  | a = REAL_NUMBER; PLUS; b = REAL_NUMBER; I
+    { ComplexLiteral(a, b) }
+
+  | a = REAL_NUMBER; MINUS; b = REAL_NUMBER; I
+    { ComplexLiteral(a, -.b) }
+;
+
+bool_constructor:
+  | TRUE
+    { BoolLiteral(true) }
+
+  | FALSE
+    { BoolLiteral(false) }
 ;
 
 

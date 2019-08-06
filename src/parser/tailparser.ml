@@ -4,6 +4,10 @@ include Syntax
 let string_of_token = function
   | INT_NUMBER n -> Printf.sprintf "INT_NUMBER(%d)" n
   | REAL_NUMBER x -> Printf.sprintf "REAL_NUMBER(%f)" x
+  | FRACTION -> "FRACTION"
+  | I -> "I"
+  | PLUS -> "PLUS"
+  | MINUS -> "MINUS"
   | NAME n -> Printf.sprintf "NAME(%s)" n
   | ATOM a -> Printf.sprintf "ATOM(%s)" a
   | SEQUENCE -> Printf.sprintf "SEQUENCE"

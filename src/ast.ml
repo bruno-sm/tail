@@ -71,6 +71,8 @@ type expression = Sequence of expression list
                 | Type of type_expression
                 | IntLiteral of int
                 | RealLiteral of float
+                | RationalLiteral of int * int
+                | ComplexLiteral of float * float
                 | StringLiteral of string
                 | AtomLiteral of string
                 | BoolLiteral of bool
@@ -154,6 +156,10 @@ let rec string_of_expression ident = function
   | IntLiteral n -> Printf.sprintf "IntLiteral\n%s| %d\n" ident n
 
   | RealLiteral x -> Printf.sprintf "RealLiteral\n%s| %f\n" ident x
+
+  | RationalLiteral (p, q) -> Printf.sprintf "RationalLiteral\n%s | %d, %d\n" ident p q
+
+  | ComplexLiteral (a, b) -> Printf.sprintf "ComplexLiteral\n%s | %f, %f\n" ident a b
 
   | StringLiteral s -> Printf.sprintf "StringLiteral\n%s| %s\n" ident s
 

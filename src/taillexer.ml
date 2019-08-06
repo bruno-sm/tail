@@ -7,20 +7,21 @@ let digit = [%sedlex.regexp? '0'..'9']
 
 let number = [%sedlex.regexp? Plus digit]
 
-let decimal = [%sedlex.regexp? number, '.', number]
+let integer = [%sedlex.regexp? Opt ('-' | '+') , number]
 
-let name = [%sedlex.regexp? Compl (':' | ',' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | uppercase | digit),
-                            Star (Compl (':' | ',' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | uppercase))]
+let decimal = [%sedlex.regexp? integer, '.', number]
 
-let name_type = [%sedlex.regexp? Compl (':' | ',' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | lowercase | digit),
-                                 Star (Compl (':' | ',' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space))]
+let name = [%sedlex.regexp? Compl ('+' | '-' | '/' | '"' | ':' | ',' | '.' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | uppercase | digit),
+                            Star (Compl ('/'| '"' | ':' | ',' | '.' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | uppercase))]
+
+let name_type = [%sedlex.regexp? Compl ('+' | '-' | '/'| '"' | ':' | ',' | '.' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space | lowercase | digit),
+                                 Star (Compl ('/'| '"' | ':' | ',' | '.' | ';' | '(' | ')' | '<' | '>' | '[' | ']' | white_space))]
 
 let atom = [%sedlex.regexp? ':', name]
 
 let atom_type = [%sedlex.regexp? ':', name_type]
 
 let universe_type = [%sedlex.regexp? "U", number]
-
 
 type context = {
   mutable token_number : int;
@@ -76,10 +77,26 @@ and lexer context lexbuf =
     | _ -> lexer context lexbuf
   end else
 
+  let rec read_string_literal lexbuf str =
+    match%sedlex lexbuf with
+      | "\\\"" -> read_string_literal lexbuf (str ^ "\"")
+      | '"' -> str
+      | any -> read_string_literal lexbuf (str ^ (Utf8.lexeme lexbuf))
+      | _ -> str
+  in
+
   let token = match%sedlex lexbuf with
-    | number -> INT_NUMBER (Utf8.lexeme lexbuf |> int_of_string)
+    | integer -> INT_NUMBER (Utf8.lexeme lexbuf |> int_of_string)
 
     | decimal -> REAL_NUMBER (Utf8.lexeme lexbuf |> float_of_string)
+
+    | "//" -> FRACTION
+
+    | "i" -> I
+
+    | '+' -> PLUS
+
+    | '-' -> MINUS
 
     | ":=" -> ASSIGN
 
@@ -98,7 +115,15 @@ and lexer context lexbuf =
 
     | ',' -> COMMA
 
+    | '.' -> POINT
+
     | ",," -> SPACE
+
+    | '"' -> STRING (read_string_literal lexbuf "")
+
+    | "True" -> TRUE
+
+    | "False" -> FALSE
 
     | "if" -> IF
 
