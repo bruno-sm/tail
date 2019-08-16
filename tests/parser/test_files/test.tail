@@ -1,0 +1,19 @@
+
+
+1; 1.2
+holis3
+:holis3
+:Holis3
+
+
+lambda v: Real and not Int -> String or Atom :=
+	if v then a elif x then b else c
+
+a : Int
+a := 1
+m : Matrix[?]
+m := [ 1,, 2 | 1,, 2 ]
+c := sum(a)(3)
+U
+U3
+

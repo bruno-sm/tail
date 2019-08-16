@@ -11,9 +11,7 @@ license: "GPL-3.0"
 depends: [
   "base"
   "cmdliner"
-  "dune" {>= "1.6.0"}
-  "shexp"
-  "menhir"
+  "mparser"
   "alcotest"
 ]
 build: [

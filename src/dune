@@ -1,15 +1,7 @@
 (env
   (dev
-    (flags (:standard -warn-error -A))))
-
-
-; Lexer library
-(library
-  (name taillexer)
-  (wrapped false)
-  (modules taillexer)
-  (libraries sedlex tailparser)
-  (preprocess (pps sedlex.ppx)))
+    (flags (:standard -warn-error -A))
+    (ocamlopt_flags -O3)))
 
 
 ; Ast library
@@ -24,4 +16,4 @@
   (public_name tailc)
   (package tail)
   (modules tailc)
-  (libraries base cmdliner taillexer tailparser ast))
+  (libraries base cmdliner result tailparser ast))

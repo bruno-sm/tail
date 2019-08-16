@@ -1,28 +1,11 @@
+(env
+  (dev
+    (flags (:standard -warn-error -A))
+    (ocamlopt_flags -O3)))
+
 ; Parser library
 (library
   (name tailparser)
   (wrapped false)
-  (modules tailparser syntax syntax_error_messages)
-  (libraries menhirLib sedlex ast))
-
-
-(menhir
-  (modules syntax)
-  (flags "-v" "--explain" "--table"))
-
-; Updates syntax_errors.messages and checks completeness
-(alias
-  (name update_error_messages)
-  (action
-    (run ocaml "-noinit" "-w" "+a" "maintain_syntax_error_messages.ml"))
-  (deps (file "maintain_syntax_error_messages.ml")
-        (file "syntax.mly")))
-
-; Compiles syntax_errors.messages into syntax_error_messages.ml
-(rule
-  (targets syntax_error_messages.ml)
-  (action
-    (with-stdout-to syntax_error_messages.ml
-      (run menhir "--compile-errors" "syntax_errors.messages" "syntax.mly")))
-  (deps (alias update_error_messages)
-        (file "syntax_errors.messages")))
+  (modules tailparser)
+  (libraries core result ast mparser))

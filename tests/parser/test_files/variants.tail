@@ -1,0 +1,9 @@
+variant Bird :: Articuno | Zapdos | Moltres
+
+Pajaro::Articuno
+
+variant Point :: Point1D(x) : Real | Point2D(x, y) : Real, Real | Point3D(x, y, z)
+
+p := Point::Point2D(2.3, 3.2)
+p.x
+p.norm()

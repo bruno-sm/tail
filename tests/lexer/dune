@@ -1,7 +1,0 @@
-(env
-  (dev
-    (flags (:standard -warn-error -A))))
-
-(tests
-  (names lexer_tests)
-  (libraries alcotest sedlex taillexer tailparser))
