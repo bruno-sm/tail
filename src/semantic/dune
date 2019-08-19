@@ -1,0 +1,11 @@
+(env
+  (dev
+    (flags (:standard -warn-error -A))
+    (ocamlopt_flags -O3)))
+
+; Parser library
+(library
+  (name tailsemantic)
+  (wrapped false)
+  (modules tailsemantic symbols_table scopechecker typechecker)
+  (libraries batteries result ast))

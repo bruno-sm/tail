@@ -172,105 +172,99 @@ let number_literal =
    <|> int_literal
 
 
-let rec type_expression s = (
-  let int_type = get_pos >>= fun sp -> string "Int" >> get_pos >>= fun ep -> return (Int (pos_info sp ep)) in
-  let real_type = get_pos >>= fun sp -> string "Real" >> get_pos >>= fun ep -> return (Real (pos_info sp ep)) in
-  let string_type = get_pos >>= fun sp -> string "String" >> get_pos >>= fun ep -> return (String (pos_info sp ep)) in
-  let atom_type = get_pos >>= fun sp -> string "Atom" >> get_pos >>= fun ep -> return (Atom (pos_info sp ep)) in
-  let specific_atom_type = get_pos >>= fun sp -> char ':' >> name_type >>= fun n -> get_pos >>= fun ep -> return (SpecificAtom (pos_info sp ep, n)) in
-  let bool_type = get_pos >>= fun sp -> string "Bool" >> get_pos >>= fun ep -> return (Bool (pos_info sp ep)) in
-  let unknown_type = get_pos >>= fun sp -> char '?' >> get_pos >>= fun ep -> return (Unknown (pos_info sp ep)) in
-  let void_type = get_pos >>= fun sp -> string "Void" >> get_pos >>= fun ep -> return (Void (pos_info sp ep)) in
-  let universe_type = get_pos >>= fun sp -> char 'U' >> get_pos >>= fun ep -> return (Universe (pos_info sp ep)) in
-  let variant_type = get_pos >>= fun sp -> name_type >>= fun v -> get_pos >>= fun ep -> return (Variant (pos_info sp ep, v)) in
-  let list_type =
-    attempt (
-      get_pos >>= fun sp -> string "List of" >> whitespace >> type_expression >>= fun t -> get_pos >>= fun ep -> return (List ((pos_info sp ep), t))
-    ) <|> (get_pos >>= fun sp -> string "List" >> get_pos >>= fun ep -> return (List ((pos_info sp ep), Unknown (pos_info sp ep)))) in
-  let vector_type =
-    attempt (
-      get_pos >>= fun sp -> string "Vector of" >> whitespace >> type_expression >>= fun t -> get_pos >>= fun ep -> return (Vector ((pos_info sp ep), t))
-    ) <|> (get_pos >>= fun sp -> string "Vector" >> get_pos >>= fun ep -> return (Vector ((pos_info sp ep), Unknown (pos_info sp ep)))) in
-  let matrix_type =
-    attempt (
-      get_pos >>= fun sp -> string "Matrix of" >> whitespace >> type_expression >>= fun t -> get_pos >>= fun ep -> return (Matrix ((pos_info sp ep), t))
-    ) <|> (get_pos >>= fun sp -> string "Matrix" >> get_pos >>= fun ep -> return (Matrix ((pos_info sp ep), Unknown (pos_info sp ep)))) in
-  let rec dictionary_type s = (
-    let valid_dictionary_type_expression =
-      attempt compound_type <|> basic_types
-    in
-    attempt (
-       get_pos >>= fun sp -> string "Dictionary of" >> whitespace >> valid_dictionary_type_expression
-       >>= fun t1 -> whitespace >> char ',' >> whitespace >> valid_dictionary_type_expression
-       >>= fun t2 -> get_pos >>= fun ep -> return (Dictionary ((pos_info sp ep), t1, t2))
-    ) <|> (get_pos >>= fun sp -> string "Dictionary">> get_pos >>= fun ep -> return (Dictionary ((pos_info sp ep), Unknown (pos_info sp ep), Unknown (pos_info sp ep))))
-  )s
-  and parentheses_type s = (
-    get_pos >>= fun sp -> between (char '(') (char ')') (whitespace >> type_expression << whitespace)
-    >>= fun e -> get_pos >>= fun ep -> return (ParenthesesType ((pos_info sp ep), e))
-  )s
-  and basic_types s = (
-    choice [
-      attempt int_type;
-      attempt real_type;
-      attempt string_type;
-      attempt atom_type;
-      attempt specific_atom_type;
-      attempt bool_type;
-      attempt unknown_type;
-      attempt void_type;
-      attempt universe_type;
-      attempt list_type;
-      attempt vector_type;
-      attempt matrix_type;
-      attempt dictionary_type;
-      attempt parentheses_type;
-      variant_type;
-    ])s
+   let rec type_expression s = (
+     let int_type = string "Int" >>$ Int in
+     let real_type = string "Real" >>$ Real in
+     let string_type = string "String" >>$ String in
+     let atom_type = string "Atom" >>$ Atom in
+     let specific_atom_type = char ':' >> name_type |>> fun n -> SpecificAtom n in
+     let bool_type = string "Bool" >>$ Bool in
+     let unknown_type = char '?' >>$ Unknown in
+     let void_type = string "Void" >>$ Void in
+     let universe_type = char 'U' >>$ Universe in
+     let variant_type = name_type >>= fun v -> return (Variant v) in
+     let list_type =
+       attempt (
+         (string "List of" >> whitespace >> type_expression |>> fun t -> List t)
+       ) <|> (string "List" >>$ List Unknown) in
+     let vector_type =
+       attempt (
+         (string "Vector of" >> whitespace >> type_expression |>> fun t -> Vector t)
+       ) <|> (string "Vector" >>$ Vector Unknown) in
+     let matrix_type =
+       attempt (
+         (string "Matrix of" >> whitespace >> type_expression |>> fun t -> Matrix t)
+       ) <|> (string "Matrix" >>$ Matrix Unknown) in
+     let rec dictionary_type s = (
+       let valid_dictionary_type_expression =
+         attempt compound_type <|> basic_types
+       in
+       attempt (
+         (string "Dictionary of" >> whitespace >> valid_dictionary_type_expression
+          >>= fun t1 -> whitespace >> char ',' >> whitespace >> valid_dictionary_type_expression
+          >>= fun t2 -> return (Dictionary (t1, t2)))
+       ) <|> (string "Dictionary" >>$ Dictionary (Unknown, Unknown))
+     )s
+     and parentheses_type s = (
+       between (char '(') (char ')') (whitespace >> type_expression << whitespace)
+       |>> fun e -> ParenthesesType e
+     )s
+     and basic_types s = (
+       choice [
+         attempt int_type;
+         attempt real_type;
+         attempt string_type;
+         attempt atom_type;
+         attempt specific_atom_type;
+         attempt bool_type;
+         attempt unknown_type;
+         attempt void_type;
+         attempt universe_type;
+         attempt list_type;
+         attempt vector_type;
+         attempt matrix_type;
+         attempt dictionary_type;
+         attempt parentheses_type;
+         variant_type;
+       ])s
 
-  and compound_type s = (
-    let type_operators =
-      [
-        [
-          Prefix (get_pos >>= (fun sp -> string "not" >> get_pos >>=
-          fun ep -> return (fun a -> (Complement ((pos_info sp ep), a)))))
-        ];
-        [
-          Infix (get_pos >>= (fun sp -> string "and" >> get_pos >>=
-          fun ep -> return (fun a b -> (Intersection ((pos_info sp ep), a, b)))), Assoc_left)
-        ];
-        [
-          Infix (get_pos >>= (fun sp -> string "or" >> get_pos >>=
-          fun ep -> return (fun a b -> (Union ((pos_info sp ep), a, b)))), Assoc_left)
-        ];
-        [
-          Infix (get_pos >>= (fun sp -> string "->" >> get_pos >>=
-          fun ep -> return (fun a b -> (Arrow ((pos_info sp ep), a, b)))), Assoc_left)
-        ];
-      ] in
-    let valid_compound_type_expression =
-      attempt (tuple_type ~allow_compound:false)
-      <|> basic_types
-    in
-    expression' type_operators valid_compound_type_expression
-  )s
-  and tuple_type ?(allow_compound = true) s = (
-    let valid_tuple_type_expression =
-      if allow_compound then
-        (attempt compound_type <|> basic_types)
-      else basic_types
-    in
-    get_pos >>= fun sp ->
-    (whitespace >> valid_tuple_type_expression << whitespace)
-    >>= fun first_exp -> char ','
-    >>= fun _ -> sep_by1 (whitespace >> valid_tuple_type_expression << whitespace) (char ',')
-    >>= fun exp_list -> get_pos
-    >>= fun ep -> return (Tuple (pos_info sp ep, first_exp::exp_list))
-  )s in
-  attempt tuple_type
-  <|> attempt compound_type
-  <|> basic_types
-)s
+     and compound_type s = (
+       let type_operators =
+         [
+           [
+             Prefix (string "not" |>> (fun _ a-> (Complement a)))
+           ];
+           [
+             Infix (string "and" |>> (fun _ a b -> (Intersection (a, b))), Assoc_left)
+           ];
+           [
+             Infix (string "or" |>> (fun _ a b -> (Union (a, b))), Assoc_left)
+           ];
+           [
+             Infix (string "->" |>> (fun _ a b -> (Arrow (a, b))), Assoc_left);
+           ];
+         ] in
+       let valid_compound_type_expression =
+         attempt (tuple_type ~allow_compound:false)
+         <|> basic_types
+       in
+       expression' type_operators valid_compound_type_expression
+     )s
+     and tuple_type ?(allow_compound = true) s = (
+       let valid_tuple_type_expression =
+         if allow_compound then
+           (attempt compound_type <|> basic_types)
+         else basic_types
+       in
+       (whitespace >> valid_tuple_type_expression << whitespace)
+       >>= fun first_exp -> char ','
+       >>= fun _ -> sep_by1 (whitespace >> valid_tuple_type_expression << whitespace) (char ',')
+       >>= fun exp_list -> return (Tuple (first_exp::exp_list))
+     )s in
+     attempt tuple_type
+     <|> attempt compound_type
+     <|> basic_types
+   )s
 
 
 let type_annotation =
@@ -294,7 +288,7 @@ let variant_declaration =
       get_pos >>= fun sp ->
       name_type >>= fun n -> whitespace >> (attempt arg_list <|> return [])
       >>= fun a -> whitespace
-      >> (attempt type_ann <|> (get_pos >>= fun ep -> return (Unknown (pos_info sp ep))))
+      >> (attempt type_ann <|> (get_pos >>= fun ep -> return (Unknown)))
       >>= fun t -> return {name = n; arguments = a; argument_type = t}
     in
     sep_by1 (whitespace >> constructor << whitespace) (char '|')
@@ -428,7 +422,7 @@ and lambda s = (
                           | Some t -> return t
                           | None -> get_pos >>= fun ep ->
                                     let info = pos_info sp ep in
-                                    return (Arrow(info, Unknown info, Unknown info))
+                                    return (Arrow(Unknown, Unknown))
   in
   get_pos >>= fun sp ->
   string "lambda" >> whitespace >> argument_list
@@ -447,7 +441,7 @@ and function_declaration_ss s = (
   >> string ":=" >> whitespace >> expr ~newline_seqs:false
   >>= fun e -> get_pos
   >>= fun ep -> let info = pos_info sp ep in
-                return (Assignment (info, true, n, Lambda (info, arg, Arrow(info, Unknown info, Unknown info), e)))
+                return (Assignment (info, true, n, Lambda (info, arg, Arrow(Unknown, Unknown), e)))
 )s
 
 
@@ -532,13 +526,15 @@ and method_ss s = (
 
 and conditional s = (
   let elif =
+    whitespace >> many newline >>
     get_pos >>= fun sp ->
     string "elif" >> whitespace >> expr
-    >>= fun cond -> whitespace >> string "then" >> whitespace >> expr
+    >>= fun cond -> whitespace >> string "then" >> whitespace >> expr ~newline_seqs:false
     >>= fun body -> get_pos
     >>= fun ep -> return (Elif (pos_info sp ep, cond, body))
   in
   let _else =
+    whitespace >> many newline >>
     get_pos >>= fun sp ->
     string "else" >> whitespace >> expr ~newline_seqs:false
     >>= fun body -> get_pos
@@ -546,9 +542,9 @@ and conditional s = (
   in
   get_pos >>= fun sp ->
   string "if" >> whitespace >> expr
-  >>= fun if_cond -> whitespace >> string "then" >> whitespace >> expr
-  >>= fun if_body -> whitespace >> many newline >> many elif
-  >>= fun elif_list -> whitespace >> many newline >> option _else
+  >>= fun if_cond -> whitespace >> string "then" >> whitespace >> expr ~newline_seqs:false
+  >>= fun if_body -> many (attempt elif)
+  >>= fun elif_list -> option (attempt _else)
   >>= fun else_opt -> get_pos
   >>= fun ep -> return (If (pos_info sp ep, if_cond, if_body, elif_list, else_opt))
 )s

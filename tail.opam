@@ -12,6 +12,7 @@ depends: [
   "base"
   "cmdliner"
   "mparser"
+  "batteries"
   "alcotest"
 ]
 build: [

@@ -1,4 +1,5 @@
 module P = Tailparser
+module S = Tailsemantic
 
 
 type command = CmdDefault
@@ -16,7 +17,7 @@ let rec tailc source output command =
 
 and compile source_channel =
   match P.parse source_channel with
-  | Ok ast -> Ast.string_of_expression ast |> print_endline
+  | Ok ast -> Ast.string_of_expression ast |> print_endline; S.check_semantics ast
   | Error (pos, msg) -> P.print_syntax_error source_channel pos msg
 
 

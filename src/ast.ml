@@ -4,83 +4,81 @@ type info = {
   _type : type_expression option;
 }
 
-and type_expression = Int of info
-                     | Real of info
-                     | String of info
-                     | Atom of info
-                     | SpecificAtom of info * string
-                     | Bool of info
-                     | Unknown of info
-                     | Void of info
-                     | Universe of info
-                     | Variant of info * string
-                     | Arrow of info * type_expression * type_expression
-                     | Tuple of info * type_expression list
-                     | List of info * type_expression
-                     | Vector of info * type_expression
-                     | Matrix of info * type_expression
-                     | Dictionary of info * type_expression * type_expression
-                     | Union of info * type_expression * type_expression
-                     | Intersection of info * type_expression * type_expression
-                     | Complement of info * type_expression
-                     | ParenthesesType of info * type_expression
+and type_expression = Int
+                     | Real
+                     | String
+                     | Atom
+                     | SpecificAtom of string
+                     | Bool
+                     | Unknown
+                     | Void
+                     | Universe
+                     | Variant of string
+                     | Arrow of type_expression * type_expression
+                     | Tuple of type_expression list
+                     | List of type_expression
+                     | Vector of type_expression
+                     | Matrix of type_expression
+                     | Dictionary of type_expression * type_expression
+                     | Union of type_expression * type_expression
+                     | Intersection of type_expression * type_expression
+                     | Complement of type_expression
+                     | ParenthesesType of type_expression
 
 
 let pos_info s e = {start_pos=s; end_pos=e; _type=None}
 
 
 let rec string_of_type_expression = function
-  | Int _ -> "Int"
+  | Int -> "Int"
 
-  | Real _ -> "Real"
+  | Real -> "Real"
 
-  | String _ -> "String"
+  | String -> "String"
 
-  | Atom _ -> "Atom"
+  | Atom -> "Atom"
 
-  | SpecificAtom (_, s) -> Printf.sprintf "SpecificAtom(%s)" s
+  | SpecificAtom s -> Printf.sprintf "SpecificAtom(%s)" s
 
-  | Bool _ -> "Bool"
+  | Bool -> "Bool"
 
-  | Unknown _ -> "Unknown"
+  | Unknown -> "Unknown"
 
-  | Void _ -> "Void"
+  | Void -> "Void"
 
-  | Universe _ -> "Universe"
+  | Universe -> "Universe"
 
-  | Variant  (_, v) -> Printf.sprintf "Variant(%s)" v
+  | Variant v -> Printf.sprintf "Variant(%s)" v
 
-  | Arrow (_, source, target) -> Printf.sprintf "Arrow(%s, %s)"
+  | Arrow (source, target) -> Printf.sprintf "Arrow(%s, %s)"
                               (string_of_type_expression source)
                               (string_of_type_expression target)
 
-  | Tuple (_, types) -> Printf.sprintf("Tuple(%s)")
+  | Tuple types -> Printf.sprintf("Tuple(%s)")
                    (List.map string_of_type_expression types |>
                     List.fold_left (fun s1 s2 -> s1 ^ ", " ^ s2) "")
 
-  | List (_, t) -> Printf.sprintf("List(%s)") @@ string_of_type_expression t
+  | List t -> Printf.sprintf("List(%s)") @@ string_of_type_expression t
 
-  | Vector (_,t) -> Printf.sprintf("Vector(%s)") @@ string_of_type_expression t
+  | Vector t -> Printf.sprintf("Vector(%s)") @@ string_of_type_expression t
 
-  | Matrix (_, t) -> Printf.sprintf("Matrix(%s)") @@ string_of_type_expression t
+  | Matrix t -> Printf.sprintf("Matrix(%s)") @@ string_of_type_expression t
 
-  | Dictionary (_, t1, t2) -> Printf.sprintf("Dictionary(%s, %s)")
+  | Dictionary (t1, t2) -> Printf.sprintf("Dictionary(%s, %s)")
                            (string_of_type_expression t1)
                            (string_of_type_expression t2)
 
-  | Union (_, t1, t2) -> Printf.sprintf("Union(%s, %s)")
+  | Union (t1, t2) -> Printf.sprintf("Union(%s, %s)")
                       (string_of_type_expression t1)
                       (string_of_type_expression t2)
 
-  | Intersection (_, t1, t2) -> Printf.sprintf("Intersection(%s, %s)")
+  | Intersection (t1, t2) -> Printf.sprintf("Intersection(%s, %s)")
                              (string_of_type_expression t1)
                              (string_of_type_expression t2)
 
-  | Complement (_, t) -> Printf.sprintf("Complement(%s)") @@ string_of_type_expression t
+  | Complement t -> Printf.sprintf("Complement(%s)") @@ string_of_type_expression t
 
-  | ParenthesesType (_, t) -> Printf.sprintf("ParenthesesType(%s)") @@ string_of_type_expression t
-
-  | _ -> "Other type expression"
+  | ParenthesesType t -> Printf.sprintf("ParenthesesType(%s)") @@ string_of_type_expression t
 
 
 type expression = Sequence of info * expression list
@@ -95,16 +93,14 @@ type expression = Sequence of info * expression list
                 | VariantDeclaration of info * string * variant_constructor list
                 | VariantInstance of info * string * string * expression option
                 | VariantProjection of info * expression * string
-                | MethodSS of info * expression * expression
                 | Assignment of info * bool * string * expression
-                | If of info* expression * expression *
+                | If of info * expression * expression *
                         expression list *
                         expression option
                 | Elif of info * expression * expression
                 | Else of info * expression
                 | Match of info * expression * (expression * expression) list
                 | AnyMatch of info
-                | Type of info * type_expression
                 | IntLiteral of info * int
                 | RealLiteral of info * float
                 | RationalLiteral of info * int * int
@@ -212,12 +208,6 @@ let rec string_of_expression ident = function
                                           ident
                                           label
 
-  | MethodSS (_, variant, fcall) -> Printf.sprintf "MethodSS\n%s| %s\n%s| %s\n"
-                                 ident
-                                 (string_of_expression (ident ^ " ") variant)
-                                 ident
-                                 (string_of_expression (ident ^ " ") fcall)
-
   | Assignment (_, _, name, e) -> Printf.sprintf "Assignment(%s)\n%s| %s\n"
                             name
                             ident
@@ -266,10 +256,6 @@ let rec string_of_expression ident = function
                            (List.fold_left (fun a b -> a ^ b) "" patterns_str) end
 
   | AnyMatch _ -> "AnyMatch"
-
-  | Type (_, t) -> Printf.sprintf "Type\n%s| %s\n"
-              ident
-              (string_of_type_expression t)
 
   | IntLiteral (_, n) -> Printf.sprintf "IntLiteral\n%s| %d\n" ident n
 
