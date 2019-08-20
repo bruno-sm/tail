@@ -6,6 +6,8 @@ type info = {
 
 and type_expression = Int
                      | Real
+                     | Rational
+                     | Complex
                      | String
                      | Atom
                      | SpecificAtom of string
@@ -24,6 +26,9 @@ and type_expression = Int
                      | Intersection of type_expression * type_expression
                      | Complement of type_expression
                      | ParenthesesType of type_expression
+                     | File
+                     | WriteFile
+                     | ReadFile
 
 
 let pos_info s e = {start_pos=s; end_pos=e; _type=None}
@@ -34,11 +39,15 @@ let rec string_of_type_expression = function
 
   | Real -> "Real"
 
+  | Rational -> "Rational"
+
+  | Complex -> "Complex"
+
   | String -> "String"
 
   | Atom -> "Atom"
 
-  | SpecificAtom s -> Printf.sprintf "SpecificAtom(%s)" s
+  | SpecificAtom s -> Printf.sprintf ":%s" s
 
   | Bool -> "Bool"
 
@@ -46,39 +55,45 @@ let rec string_of_type_expression = function
 
   | Void -> "Void"
 
-  | Universe -> "Universe"
+  | Universe -> "U"
 
   | Variant v -> Printf.sprintf "Variant(%s)" v
 
-  | Arrow (source, target) -> Printf.sprintf "Arrow(%s, %s)"
+  | Arrow (source, target) -> Printf.sprintf "%s -> %s"
                               (string_of_type_expression source)
                               (string_of_type_expression target)
 
-  | Tuple types -> Printf.sprintf("Tuple(%s)")
+  | Tuple types -> Printf.sprintf("%s")
                    (List.map string_of_type_expression types |>
                     List.fold_left (fun s1 s2 -> s1 ^ ", " ^ s2) "")
 
-  | List t -> Printf.sprintf("List(%s)") @@ string_of_type_expression t
+  | List t -> Printf.sprintf("List of %s") @@ string_of_type_expression t
 
-  | Vector t -> Printf.sprintf("Vector(%s)") @@ string_of_type_expression t
+  | Vector t -> Printf.sprintf("Vector of %s") @@ string_of_type_expression t
 
-  | Matrix t -> Printf.sprintf("Matrix(%s)") @@ string_of_type_expression t
+  | Matrix t -> Printf.sprintf("Matrix of %s") @@ string_of_type_expression t
 
-  | Dictionary (t1, t2) -> Printf.sprintf("Dictionary(%s, %s)")
+  | Dictionary (t1, t2) -> Printf.sprintf("Dictionary of %s, %s")
                            (string_of_type_expression t1)
                            (string_of_type_expression t2)
 
-  | Union (t1, t2) -> Printf.sprintf("Union(%s, %s)")
+  | Union (t1, t2) -> Printf.sprintf("%s or %s")
                       (string_of_type_expression t1)
                       (string_of_type_expression t2)
 
-  | Intersection (t1, t2) -> Printf.sprintf("Intersection(%s, %s)")
+  | Intersection (t1, t2) -> Printf.sprintf("%s and %s")
                              (string_of_type_expression t1)
                              (string_of_type_expression t2)
 
-  | Complement t -> Printf.sprintf("Complement(%s)") @@ string_of_type_expression t
+  | Complement t -> Printf.sprintf("not %s") @@ string_of_type_expression t
 
-  | ParenthesesType t -> Printf.sprintf("ParenthesesType(%s)") @@ string_of_type_expression t
+  | ParenthesesType t -> Printf.sprintf("(%s)") @@ string_of_type_expression t
+
+  | File -> "File"
+
+  | WriteFile -> "WriteFile"
+
+  | ReadFile -> "ReadFile"
 
 
 type expression = Sequence of info * expression list

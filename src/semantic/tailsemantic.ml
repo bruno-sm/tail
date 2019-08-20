@@ -4,6 +4,7 @@ open Ast
 
 let check_semantics ast =
   let st = new symbols_table None in
+  let st = fill_predefined st in
   let st = fill_constants ast st in
   st#reset_child_position;
   match scope_check ast st with
