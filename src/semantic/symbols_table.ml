@@ -1,7 +1,7 @@
 open Ast
 module Vect = Batteries.Vect
 
-type entry = VariableEntry of string * type_expression * bool
+type entry = VariableEntry of string * type_expression * bool * bool (* name, type, initialized, constant *)
            | VariantEntry of string * variant_constructor list
 
 
@@ -13,24 +13,22 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
 
 
   method add_child child =
-    index <- index + 1;
-    if index >= Vect.length children then
+      index <- index + 1;
       children <- Vect.append child children
-    else
-      children <- Vect.set children index child
+
+
+  method update_child child = children <- Vect.set children index child
 
 
   method next_child =
-    try
-      let c = Vect.get children (index + 1) in
-        index <- index + 1;
-        Some c
-    with
-    | Vect.Out_of_bounds -> None
+    let c = Vect.get children (index + 1) in
+      index <- index + 1;
+      c
 
 
   method reset_child_position =
-    index <- -1
+    index <- -1;
+    Vect.iter (fun c -> c#reset_child_position) children
 
 
   method add_entry entry =
@@ -51,7 +49,7 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
      try
        Some (Vect.find (
          fun x -> match x with
-                  | VariableEntry (n, _, _) -> n = name
+                  | VariableEntry (n, _, _, _) -> n = name
                   | _ -> false
        ) table)
      with
@@ -82,7 +80,7 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
     try
       Some (Vect.find (
         fun x -> match x with
-                 | VariableEntry (n, t, true) -> n = name &&
+                 | VariableEntry (n, t, true, _) -> n = name &&
                    begin match t with
                    | Arrow (t1, _) -> t1 = arg_type || check_unknown t1 arg_type
                    | _ -> false
@@ -111,7 +109,7 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
 
   method get_function_restype name arg_type =
     match self#find_function name arg_type with
-      | Some (VariableEntry (_, t, true)) ->
+      | Some (VariableEntry (_, t, true, _)) ->
         begin match t with
         | Arrow (_, t2) -> Some t2
         | _ -> None
@@ -121,8 +119,8 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
 
   method to_string ident =
     let string_of_entry = function
-      | VariableEntry (n, t, init) ->
-        Printf.sprintf "%sVariableEntry(%s, %s, %b)" ident n (string_of_type_expression t) init
+      | VariableEntry (n, t, init, const) ->
+        Printf.sprintf "%sVariableEntry(%s, %s, %b, %b)" ident n (string_of_type_expression t) init const
       | VariantEntry (n, _) ->
         Printf.sprintf "%sVariantEntry(%s)" ident n
     in

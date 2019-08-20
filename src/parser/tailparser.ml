@@ -15,7 +15,7 @@ let whitespace =
 
 (* Not valid characters in a name *)
 let not_valid_name_chars =
-  "+-/\":,.;()<>[]{}|\t\n "
+  "+-*%/^\":,.;()<>[]{}|\t\n "
 
 
 let reserved_words =
@@ -172,99 +172,105 @@ let number_literal =
    <|> int_literal
 
 
-   let rec type_expression s = (
-     let int_type = string "Int" >>$ Int in
-     let real_type = string "Real" >>$ Real in
-     let string_type = string "String" >>$ String in
-     let atom_type = string "Atom" >>$ Atom in
-     let specific_atom_type = char ':' >> name_type |>> fun n -> SpecificAtom n in
-     let bool_type = string "Bool" >>$ Bool in
-     let unknown_type = char '?' >>$ Unknown in
-     let void_type = string "Void" >>$ Void in
-     let universe_type = char 'U' >>$ Universe in
-     let variant_type = name_type >>= fun v -> return (Variant v) in
-     let list_type =
-       attempt (
-         (string "List of" >> whitespace >> type_expression |>> fun t -> List t)
-       ) <|> (string "List" >>$ List Unknown) in
-     let vector_type =
-       attempt (
-         (string "Vector of" >> whitespace >> type_expression |>> fun t -> Vector t)
-       ) <|> (string "Vector" >>$ Vector Unknown) in
-     let matrix_type =
-       attempt (
-         (string "Matrix of" >> whitespace >> type_expression |>> fun t -> Matrix t)
-       ) <|> (string "Matrix" >>$ Matrix Unknown) in
-     let rec dictionary_type s = (
-       let valid_dictionary_type_expression =
-         attempt compound_type <|> basic_types
-       in
-       attempt (
-         (string "Dictionary of" >> whitespace >> valid_dictionary_type_expression
-          >>= fun t1 -> whitespace >> char ',' >> whitespace >> valid_dictionary_type_expression
-          >>= fun t2 -> return (Dictionary (t1, t2)))
-       ) <|> (string "Dictionary" >>$ Dictionary (Unknown, Unknown))
-     )s
-     and parentheses_type s = (
-       between (char '(') (char ')') (whitespace >> type_expression << whitespace)
-       |>> fun e -> ParenthesesType e
-     )s
-     and basic_types s = (
-       choice [
-         attempt int_type;
-         attempt real_type;
-         attempt string_type;
-         attempt atom_type;
-         attempt specific_atom_type;
-         attempt bool_type;
-         attempt unknown_type;
-         attempt void_type;
-         attempt universe_type;
-         attempt list_type;
-         attempt vector_type;
-         attempt matrix_type;
-         attempt dictionary_type;
-         attempt parentheses_type;
-         variant_type;
-       ])s
+let bool_literal =
+  get_pos >>= fun sp ->
+  (string "True" >> get_pos >>= fun ep -> return (BoolLiteral (pos_info sp ep, true)))
+  <|> (string "False" >> get_pos >>= fun ep -> return (BoolLiteral (pos_info sp ep, false)))
 
-     and compound_type s = (
-       let type_operators =
-         [
-           [
-             Prefix (string "not" |>> (fun _ a-> (Complement a)))
-           ];
-           [
-             Infix (string "and" |>> (fun _ a b -> (Intersection (a, b))), Assoc_left)
-           ];
-           [
-             Infix (string "or" |>> (fun _ a b -> (Union (a, b))), Assoc_left)
-           ];
-           [
-             Infix (string "->" |>> (fun _ a b -> (Arrow (a, b))), Assoc_left);
-           ];
-         ] in
-       let valid_compound_type_expression =
-         attempt (tuple_type ~allow_compound:false)
-         <|> basic_types
-       in
-       expression' type_operators valid_compound_type_expression
-     )s
-     and tuple_type ?(allow_compound = true) s = (
-       let valid_tuple_type_expression =
-         if allow_compound then
-           (attempt compound_type <|> basic_types)
-         else basic_types
-       in
-       (whitespace >> valid_tuple_type_expression << whitespace)
-       >>= fun first_exp -> char ','
-       >>= fun _ -> sep_by1 (whitespace >> valid_tuple_type_expression << whitespace) (char ',')
-       >>= fun exp_list -> return (Tuple (first_exp::exp_list))
-     )s in
-     attempt tuple_type
-     <|> attempt compound_type
+
+let rec type_expression s = (
+ let int_type = string "Int" >>$ Int in
+ let real_type = string "Real" >>$ Real in
+ let string_type = string "String" >>$ String in
+ let atom_type = string "Atom" >>$ Atom in
+ let specific_atom_type = char ':' >> name_type |>> fun n -> SpecificAtom n in
+ let bool_type = string "Bool" >>$ Bool in
+ let unknown_type = char '?' >>$ Unknown in
+ let void_type = string "Void" >>$ Void in
+ let universe_type = char 'U' >>$ Universe in
+ let variant_type = name_type >>= fun v -> return (Variant v) in
+ let list_type =
+   attempt (
+     (string "List of" >> whitespace >> type_expression |>> fun t -> List t)
+   ) <|> (string "List" >>$ List Unknown) in
+ let vector_type =
+   attempt (
+     (string "Vector of" >> whitespace >> type_expression |>> fun t -> Vector t)
+   ) <|> (string "Vector" >>$ Vector Unknown) in
+ let matrix_type =
+   attempt (
+     (string "Matrix of" >> whitespace >> type_expression |>> fun t -> Matrix t)
+   ) <|> (string "Matrix" >>$ Matrix Unknown) in
+ let rec dictionary_type s = (
+   let valid_dictionary_type_expression =
+     attempt compound_type <|> basic_types
+   in
+   attempt (
+     (string "Dictionary of" >> whitespace >> valid_dictionary_type_expression
+      >>= fun t1 -> whitespace >> char ',' >> whitespace >> valid_dictionary_type_expression
+      >>= fun t2 -> return (Dictionary (t1, t2)))
+   ) <|> (string "Dictionary" >>$ Dictionary (Unknown, Unknown))
+ )s
+ and parentheses_type s = (
+   between (char '(') (char ')') (whitespace >> type_expression << whitespace)
+   |>> fun e -> ParenthesesType e
+ )s
+ and basic_types s = (
+   choice [
+     attempt int_type;
+     attempt real_type;
+     attempt string_type;
+     attempt atom_type;
+     attempt specific_atom_type;
+     attempt bool_type;
+     attempt unknown_type;
+     attempt void_type;
+     attempt universe_type;
+     attempt list_type;
+     attempt vector_type;
+     attempt matrix_type;
+     attempt dictionary_type;
+     attempt parentheses_type;
+     variant_type;
+   ])s
+
+ and compound_type s = (
+   let type_operators =
+     [
+       [
+         Prefix (string "not" |>> (fun _ a-> (Complement a)))
+       ];
+       [
+         Infix (string "and" |>> (fun _ a b -> (Intersection (a, b))), Assoc_left)
+       ];
+       [
+         Infix (string "or" |>> (fun _ a b -> (Union (a, b))), Assoc_left)
+       ];
+       [
+         Infix (string "->" |>> (fun _ a b -> (Arrow (a, b))), Assoc_left);
+       ];
+     ] in
+   let valid_compound_type_expression =
+     attempt (tuple_type ~allow_compound:false)
      <|> basic_types
-   )s
+   in
+   expression' type_operators valid_compound_type_expression
+ )s
+ and tuple_type ?(allow_compound = true) s = (
+   let valid_tuple_type_expression =
+     if allow_compound then
+       (attempt compound_type <|> basic_types)
+     else basic_types
+   in
+   (whitespace >> valid_tuple_type_expression << whitespace)
+   >>= fun first_exp -> char ','
+   >>= fun _ -> sep_by1 (whitespace >> valid_tuple_type_expression << whitespace) (char ',')
+   >>= fun exp_list -> return (Tuple (first_exp::exp_list))
+ )s in
+ attempt tuple_type
+ <|> attempt compound_type
+ <|> basic_types
+)s
 
 
 let type_annotation =
@@ -310,6 +316,7 @@ let rec basic_expr s = (
   parentheses;
   string_literal;
   number_literal;
+  bool_literal;
   attempt method_ss;
   attempt variant_projection;
   attempt variant_instance;
@@ -526,7 +533,7 @@ and method_ss s = (
 
 and conditional s = (
   let elif =
-    whitespace >> many newline >>
+    spaces >>
     get_pos >>= fun sp ->
     string "elif" >> whitespace >> expr
     >>= fun cond -> whitespace >> string "then" >> whitespace >> expr ~newline_seqs:false
@@ -534,7 +541,7 @@ and conditional s = (
     >>= fun ep -> return (Elif (pos_info sp ep, cond, body))
   in
   let _else =
-    whitespace >> many newline >>
+    spaces >>
     get_pos >>= fun sp ->
     string "else" >> whitespace >> expr ~newline_seqs:false
     >>= fun body -> get_pos

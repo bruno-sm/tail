@@ -21,16 +21,19 @@ let rec fill_constants (ast:Ast.expression) (st:symbols_table) : symbols_table =
 
   | UnOp (_, _, e) -> fill_constants e st
 
-  | Lambda (_, args, t, e) -> fill_constants e st
+  | Lambda (_, args, t, e) -> fill_constants e (new symbols_table (Some (ref st))) |> st#add_child; st
 
   | FunctionCall (_, e, e_opt) ->
     let new_st = fill_constants e st in
-    fill_constants e (new symbols_table (Some (ref new_st))) |> new_st#add_child; new_st
+    begin match e_opt with
+    | Some e -> fill_constants e (new symbols_table (Some (ref new_st))) |> new_st#add_child; new_st
+    | _ -> new_st
+    end
 
   | Annotation (_, n, t) ->
     begin match st#find_variable_in_scope n with
-    | Some a -> st#update_entry a (VariableEntry (n, t, false)); st
-    | None -> st#add_entry (VariableEntry (n, t, false)); st
+    | Some a -> st#update_entry a (VariableEntry (n, t, false, false)); st
+    | None -> st#add_entry (VariableEntry (n, t, false, false)); st
     end
 
   | VariantInstance (i, v, c, e_opt) ->
@@ -41,10 +44,13 @@ let rec fill_constants (ast:Ast.expression) (st:symbols_table) : symbols_table =
 
   | Assignment (_, true, n, e) ->
     begin match st#find_variable_in_scope n with
-    | Some (VariableEntry (n, t, init)) -> st#update_entry (VariableEntry (n, t, init)) (VariableEntry (n, t, true))
+    | Some (VariableEntry (n, t, init, const)) -> st#update_entry (VariableEntry (n, t, init, const)) (VariableEntry (n, t, true, true))
     | Some (VariantEntry _) -> ()
-    | None -> st#add_entry (VariableEntry (n, Unknown, true))
+    | None -> st#add_entry (VariableEntry (n, Unknown, true, true))
     end;
+    fill_constants e (new symbols_table (Some (ref st))) |> st#add_child; st
+
+  | Assignment (_, false, n, e) ->
     fill_constants e (new symbols_table (Some (ref st))) |> st#add_child; st
 
   | If (_, cond, e, elif_list, opt_else) ->
@@ -71,7 +77,8 @@ let rec fill_constants (ast:Ast.expression) (st:symbols_table) : symbols_table =
       match lst with
       | [] -> st
       | hd::tl ->
-        fill_constants (snd hd) (new symbols_table (Some (ref st))) |> st#add_child; st
+        fill_constants (snd hd) (new symbols_table (Some (ref st))) |> st#add_child;
+        fill_constants_match tl st
       in
     let match_st = fill_constants m (new symbols_table (Some (ref st))) in
     fill_constants_match match_list match_st |> st#add_child; st
@@ -88,6 +95,7 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
       | Ok st -> scope_check_lists st tl
       | e -> e
   in
+  (*st#to_string "" |> print_endline;*)
   match ast with
 
   | Sequence (_, expressions) -> scope_check_lists st expressions
@@ -95,8 +103,8 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
   | Parentheses (_, e) -> scope_check e st
 
   | Block (_, e) ->
-    begin match scope_check e (new symbols_table (Some (ref st))) with
-    | Ok new_st -> st#add_child new_st; Ok st
+    begin match scope_check e st#next_child with
+    | Ok new_st -> Ok st
     | e -> e
     end
 
@@ -112,26 +120,21 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
     begin match st#find_variable n with
     | Some v ->
       begin match v with
-      | VariableEntry (n, _, false) -> Error (i, Printf.sprintf "The variable %s is not initialized." n)
+      | VariableEntry (n, _, false, _) -> Error (i, Printf.sprintf "The variable %s is not initialized." n)
       | _ -> Ok st
       end
-    | None -> Error (i, Printf.sprintf "")
+    | None -> Error (i, Printf.sprintf "%s doesn't exist." n)
     end
 
-  | Lambda (_, args, t, e) ->
-    let new_st = (new symbols_table (Some (ref st))) in
-    let arg_types =
-      match t with
-      | Tuple l -> l
-      | t -> [t]
-    in
+  | Lambda (i, args, _, e) ->
+    let new_st = st#next_child in
     let rec add_args = function
       | [] -> ()
-      | (n, t)::tl -> new_st#add_entry (VariableEntry (n, t, true)); add_args tl
+      | hd::tl -> new_st#add_entry (VariableEntry (hd, Unknown, true, true)); add_args tl
     in
-      List.combine args arg_types |> add_args;
+      add_args args;
       begin match scope_check e new_st with
-      | Ok new_st -> st#add_child new_st; Ok st
+      | Ok new_st -> st#update_child new_st; Ok st
       | e -> e
       end
 
@@ -139,16 +142,21 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
     begin match scope_check e st with
     | Ok st ->
       begin match e_opt with
-      | Some e -> scope_check e st
+      | Some e ->
+        begin match scope_check e st#next_child with
+        | Ok new_st -> st#update_child new_st; Ok st
+        | e -> e
+        end
       | None -> Ok st
       end
     | e -> e
     end
 
-  | Annotation (_, n, t) ->
-    begin match st#find_variable n with
-    | Some _ -> Ok st
-    | None -> st#add_entry (VariableEntry (n, t, false)); Ok st
+  | Annotation (i, n, t) ->
+    begin match st#find_variable_in_scope n with
+    | Some (VariableEntry (n, t, init, false)) -> st#update_entry (VariableEntry (n, t, init, false)) (VariableEntry (n, t, false, false)); Ok st
+    | Some (VariableEntry (n, new_t, init, true)) -> if t = new_t then Ok st else Error (i, Printf.sprintf "%s can not be retyped." n)
+    | None -> st#add_entry (VariableEntry (n, t, false, false)); Ok st
     end
 
   | VariantDeclaration (_, v, constructors) -> st#add_entry (VariantEntry (v, constructors)); Ok st
@@ -157,24 +165,43 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
     begin match st#find_variant_constructor v c with
     | Some _ ->
       begin match e_opt with
-      | Some e -> scope_check e st
+      | Some e ->
+        begin match scope_check e st#next_child with
+        | Ok new_st -> st#update_child new_st; Ok st
+        | e -> e
+        end
       | None -> Ok st
       end
     | None -> Error (i, Printf.sprintf "Variant %s::%s not defined." v c)
     end
 
-  | Assignment (_, false, n, _) ->
-    begin match st#find_variable n with
-    | Some (VariableEntry (n, t, init)) -> st#update_entry (VariableEntry (n, t, init)) (VariableEntry (n, t, true)); Ok st
-    | Some (VariantEntry _) -> Ok st
-    | None -> st#add_entry (VariableEntry (n, Unknown, true)); Ok st
+  | Assignment (i, false, n, e) ->
+    let check_e st =
+      begin match scope_check e st#next_child with
+      | Ok new_st ->  Ok st
+      | e -> e
+      end
+    in
+    begin match st#find_variable_in_scope n with
+    | Some (VariableEntry (n, t, init, false)) -> st#update_entry (VariableEntry (n, t, init, false)) (VariableEntry (n, t, true, false)); check_e st
+    | Some (VariableEntry _) -> Error (i, Printf.sprintf "%s can not be redefined." n)
+    | Some (VariantEntry _) -> check_e st
+    | None -> st#add_entry (VariableEntry (n, Unknown, true, false)); check_e st
+    end
+
+  | Assignment (i, true, n, e) ->
+    begin match scope_check e st#next_child with
+    | Ok new_st -> Ok st
+    | e -> e
     end
 
   | If (_, cond, e, elif_list, opt_else) ->
-    begin match scope_check cond st with
-    | Ok st ->
-      begin match scope_check e st with
-      | Ok st ->
+    begin match scope_check cond st#next_child with
+    | Ok cond_st ->
+      begin match scope_check e cond_st#next_child with
+      | Ok e_st ->
+        cond_st#update_child e_st;
+        st#update_child cond_st;
         begin match scope_check_lists st elif_list  with
         | Ok st ->
           begin match opt_else with
@@ -193,18 +220,18 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
     end
 
   | Elif (_, cond, e) ->
-    begin match scope_check cond st with
-    | Ok st ->
-      begin match scope_check e st with
-      | Ok st -> Ok st
+    begin match scope_check cond st#next_child with
+    | Ok cond_st ->
+      begin match scope_check e cond_st#next_child with
+      | Ok e_st -> cond_st#update_child e_st; st#update_child cond_st; Ok st
       | e -> e
       end
     | e -> e
     end
 
   | Else (_, e) ->
-    begin match scope_check e st with
-    | Ok st -> Ok st
+    begin match scope_check e st#next_child with
+    | Ok e_st -> st#update_child e_st; Ok st
     | e -> e
     end
 
@@ -215,14 +242,18 @@ let rec scope_check (ast:Ast.expression) (st:symbols_table) : (symbols_table, in
         let (pattern, e) = hd in
         match scope_check pattern st with
         | Ok st ->
-          begin match scope_check e st with
-          | Ok st -> scope_check_matchs st tl
+          begin match scope_check e st#next_child with
+          | Ok e_st -> st#update_child e_st; scope_check_matchs st tl
           | e -> e
           end
         | e -> e
     in
-    begin match scope_check m st with
-    | Ok st -> scope_check_matchs st match_list
+    begin match scope_check m st#next_child with
+    | Ok m_st ->
+      begin match scope_check_matchs m_st match_list with
+      | Ok new_st -> st#update_child new_st; Ok st
+      | e -> e
+      end
     | e -> e
     end
 
