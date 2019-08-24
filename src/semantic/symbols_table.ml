@@ -1,8 +1,9 @@
 open Ast
 module Vect = Batteries.Vect
 
-type entry = VariableEntry of string * type_expression * bool * bool (* name, type, initialized, constant *)
+type entry = VariableEntry of string * type_expression * bool (* name, type, initialized*)
            | VariantEntry of string * variant_constructor list
+           | FunctionEntry of string * type_expression * type_expression
 
 
 
@@ -45,11 +46,19 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
                    | None -> ()
 
 
+   method remove_entry_in_scope entry =
+     try
+       let i = Vect.findi (fun x -> x = entry) table in
+       table <- Vect.remove i 1 table
+     with
+     | Not_found -> ()
+
+
    method find_variable_in_scope name =
      try
        Some (Vect.find (
          fun x -> match x with
-                  | VariableEntry (n, _, _, _) -> n = name
+                  | VariableEntry (n, _, _) -> n = name
                   | _ -> false
        ) table)
      with
@@ -64,32 +73,37 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
               | None -> None
 
 
-  method find_function name arg_type =
-    let rec check_unknown t1 t2 =
-      match t1 with
-      | Unknown -> true
-      | Tuple t1_list ->
-        begin match t2 with
-          | Tuple t2_list ->
-            List.length t1_list = List.length t2_list &&
-            List.fold_left2 (fun a b c -> a && (check_unknown b c)) true t1_list t2_list
-          | _ -> false
-        end
-      | _ -> false
-    in
+  method find_function_by_name name =
     try
       Some (Vect.find (
         fun x -> match x with
-                 | VariableEntry (n, t, true, _) -> n = name &&
-                   begin match t with
-                   | Arrow (t1, _) -> t1 = arg_type || check_unknown t1 arg_type
-                   | _ -> false
-                   end
+                 | FunctionEntry (n, _, _) -> n = name
                  | _ -> false
       ) table)
     with
     | Not_found -> match parent with
-                   | Some p -> (!p)#find_variable name
+                   | Some p -> (!p)#find_function_by_name name
+                   | None -> None
+
+
+  method find_function name arg_type =
+    let rec compatible_arg_type st arg_type =
+      match (st, arg_type) with
+      | (Tuple st_l, Tuple arg_type_l) ->
+        List.map2 (fun t1 t2 -> compatible_arg_type t1 t2) st_l arg_type_l |>
+        List.fold_left (fun x y -> x && y) true
+      | _ -> arg_type = Unknown || st = Unknown || st = arg_type
+    in
+    try
+      Some (Vect.find (
+        fun x -> match x with
+                 | FunctionEntry (n, st, dt) -> n = name &&
+                                                compatible_arg_type st arg_type
+                 | _ -> false
+      ) table)
+    with
+    | Not_found -> match parent with
+                   | Some p -> (!p)#find_function name arg_type
                    | None -> None
 
 
@@ -109,20 +123,18 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
 
   method get_function_restype name arg_type =
     match self#find_function name arg_type with
-      | Some (VariableEntry (_, t, true, _)) ->
-        begin match t with
-        | Arrow (_, t2) -> Some t2
-        | _ -> None
-        end
+      | Some (FunctionEntry (n, st, dt)) -> Some dt
       | _ -> None
 
 
   method to_string ident =
     let string_of_entry = function
-      | VariableEntry (n, t, init, const) ->
-        Printf.sprintf "%sVariableEntry(%s, %s, %b, %b)" ident n (string_of_type_expression t) init const
+      | VariableEntry (n, t, init) ->
+        Printf.sprintf "%sVariableEntry(%s, %s, %b)" ident n (string_of_type_expression t) init
       | VariantEntry (n, _) ->
         Printf.sprintf "%sVariantEntry(%s)" ident n
+      | FunctionEntry (n, st, dt) ->
+        Printf.sprintf "%sFunctionEntry(%s, %s)" ident n (string_of_type_expression (Arrow(st, dt)))
     in
     let table_string_list = Vect.map (fun x -> string_of_entry x) table in
     let table_string = Vect.fold_left (fun a b -> a ^ "\n" ^ b) "" table_string_list in

@@ -1,7 +1,7 @@
 type info = {
   start_pos : int * int * int;
   end_pos : int * int * int;
-  _type : type_expression option;
+  _type : type_expression;
 }
 
 and type_expression = Int
@@ -16,6 +16,7 @@ and type_expression = Int
                      | Void
                      | Universe
                      | Variant of string
+                     | VariantConstructor of string * string
                      | Arrow of type_expression * type_expression
                      | Tuple of type_expression list
                      | List of type_expression
@@ -31,7 +32,7 @@ and type_expression = Int
                      | ReadFile
 
 
-let pos_info s e = {start_pos=s; end_pos=e; _type=None}
+let pos_info s e = {start_pos=s; end_pos=e; _type=Unknown}
 
 
 let rec string_of_type_expression = function
@@ -59,11 +60,13 @@ let rec string_of_type_expression = function
 
   | Variant v -> Printf.sprintf "Variant(%s)" v
 
+  | VariantConstructor (v, c) -> Printf.sprintf "Variant(%s::%s)" v c
+
   | Arrow (source, target) -> Printf.sprintf "%s -> %s"
                               (string_of_type_expression source)
                               (string_of_type_expression target)
 
-  | Tuple types -> Printf.sprintf("%s")
+  | Tuple types -> Printf.sprintf("(%s)")
                    (List.map string_of_type_expression types |>
                     List.fold_left (fun s1 s2 -> s1 ^ ", " ^ s2) "")
 
@@ -100,15 +103,17 @@ type expression = Sequence of info * expression list
                 | Parentheses of info * expression
                 | Block of info * expression
                 | BinOp of info * operator * expression * expression
-                | UnOp of info * operator * expression
+                | PrefixOp of info * operator * expression
+                | PostfixOp of info * operator * expression
                 | Variable of info * string
+                | Function of info * string * string list * expression
                 | Lambda of info * string list * type_expression * expression
                 | FunctionCall of info * expression * expression option
                 | Annotation of info * string * type_expression
                 | VariantDeclaration of info * string * variant_constructor list
                 | VariantInstance of info * string * string * expression option
                 | VariantProjection of info * expression * string
-                | Assignment of info * bool * string * expression
+                | Assignment of info * string * expression
                 | If of info * expression * expression *
                         expression list *
                         expression option
@@ -118,8 +123,6 @@ type expression = Sequence of info * expression list
                 | AnyMatch of info
                 | IntLiteral of info * int
                 | RealLiteral of info * float
-                | RationalLiteral of info * int * int
-                | ComplexLiteral of info * float * float
                 | StringLiteral of info * string
                 | AtomLiteral of info * string
                 | BoolLiteral of info * bool
@@ -142,6 +145,7 @@ and operator = Add
              | And
              | Xor
              | Or
+             | Not
              | Equal
              | Different
              | Less
@@ -155,6 +159,29 @@ and variant_constructor = {
   arguments : string list;
   argument_type : type_expression;
 }
+
+
+let operator_name = function
+  | Add -> "+"
+  | Sub -> "-"
+  | Mul -> "*"
+  | Div -> "/"
+  | Frac -> "//"
+  | Rem -> "%"
+  | Exp -> "^"
+  | I -> "i"
+  | Typeof -> "typeof"
+  | And -> "and"
+  | Xor -> "xor"
+  | Or -> "or"
+  | Not -> "not"
+  | Equal -> "="
+  | Different -> "!="
+  | Less -> "<"
+  | LessEqual -> "<="
+  | Greater -> ">"
+  | GreaterEqual -> ">="
+  | Projection _ -> "."
 
 
 let rec string_of_expression ident = function
@@ -178,12 +205,21 @@ let rec string_of_expression ident = function
                           ident
                           (string_of_expression (ident ^ " ") e2)
 
-  | UnOp (_, op, e) -> Printf.sprintf "UnOp(%s)\n%s| %s\n"
+  | PrefixOp (_, op, e) -> Printf.sprintf "UnOp(%s)\n%s| %s\n"
+                          (string_of_operator ident op)
+                          ident
+                          (string_of_expression (ident ^ " ") e)
+
+  | PostfixOp (_, op, e) -> Printf.sprintf "UnOp(%s)\n%s| %s\n"
                           (string_of_operator ident op)
                           ident
                           (string_of_expression (ident ^ " ") e)
 
   | Variable (_, v) -> Printf.sprintf "Variable\n%s| %s\n" ident v
+
+  | Function (_, n, args, e) -> Printf.sprintf "Function(%s)(%s)\n%s| %s\n"
+                             n (List.fold_left (fun a b -> a ^ ", " ^ b) "" args) ident
+                             (string_of_expression ident e)
 
   | Lambda (_, args, t, e) -> Printf.sprintf "Lambda(%s)\n%s| %s\n%s| %s\n"
                         (List.fold_left (fun a b -> a ^ ", " ^ b) "" args)
@@ -223,7 +259,7 @@ let rec string_of_expression ident = function
                                           ident
                                           label
 
-  | Assignment (_, _, name, e) -> Printf.sprintf "Assignment(%s)\n%s| %s\n"
+  | Assignment (_, name, e) -> Printf.sprintf "Assignment(%s)\n%s| %s\n"
                             name
                             ident
                             (string_of_expression (ident ^ " ") e)
@@ -275,10 +311,6 @@ let rec string_of_expression ident = function
   | IntLiteral (_, n) -> Printf.sprintf "IntLiteral\n%s| %d\n" ident n
 
   | RealLiteral (_, x) -> Printf.sprintf "RealLiteral\n%s| %f\n" ident x
-
-  | RationalLiteral (_, p, q) -> Printf.sprintf "RationalLiteral\n%s | %d, %d\n" ident p q
-
-  | ComplexLiteral (_, a, b) -> Printf.sprintf "ComplexLiteral\n%s | %f, %f\n" ident a b
 
   | StringLiteral (_, s) -> Printf.sprintf "StringLiteral\n%s| %s\n" ident s
 
@@ -341,6 +373,7 @@ and string_of_operator ident = function
   | And -> "And"
   | Xor -> "Xor"
   | Or -> "Or"
+  | Not -> "Not"
   | Equal -> "Equal"
   | Different -> "Different"
   | Less -> "Less"

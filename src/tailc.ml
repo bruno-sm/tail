@@ -18,6 +18,7 @@ let rec tailc source output command =
 and compile source_channel =
   match P.parse source_channel with
   | Ok ast ->
+    (*Ast.string_of_expression ast |> print_endline;*)
     begin match S.check_semantics ast with
     | Ok () -> ()
     | Error (i, msg) -> S.print_semantic_error source_channel i msg

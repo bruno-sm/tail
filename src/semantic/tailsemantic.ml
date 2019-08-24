@@ -1,5 +1,6 @@
 open Symbols_table
 open Scopechecker
+open Typechecker
 open Ast
 
 let check_semantics ast =
@@ -8,7 +9,10 @@ let check_semantics ast =
   let st = fill_constants ast st in
   st#reset_child_position;
   match scope_check ast st with
-  | Ok st -> Ok ()
+  | Ok st -> begin match st#reset_child_position; type_check ast st with
+             | Ok (_, ast) -> Ok ()
+             | Error (i, msg) -> print_endline msg; Error (i, msg)
+             end
   | Error (i, msg) -> Error (i, msg)
 
 

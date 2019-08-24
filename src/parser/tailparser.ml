@@ -141,12 +141,12 @@ let infix p op =
 
 let prefix p op =
   Prefix (get_pos >>= (fun sp -> p >>= fun _ -> get_pos
-          >>= fun ep -> return (fun a -> (UnOp (pos_info sp ep, op, a)))))
+          >>= fun ep -> return (fun a -> (PrefixOp (pos_info sp ep, op, a)))))
 
 
 let postfix p op =
   Postfix (get_pos >>= (fun sp -> p >>= fun _ -> get_pos
-          >>= fun ep -> return (fun a -> (UnOp (pos_info sp ep, op, a)))))
+          >>= fun ep -> return (fun a -> (PostfixOp (pos_info sp ep, op, a)))))
 
 
 let decimal =
@@ -181,8 +181,8 @@ let bool_literal =
 let rec type_expression s = (
  let int_type = string "Int" >>$ Int in
  let real_type = string "Real" >>$ Real in
- let real_type = string "Real" >>$ Rational in
- let real_type = string "Real" >>$ Complex in
+ let rational_type = string "Rational" >>$ Rational in
+ let complex_type = string "Complex" >>$ Complex in
  let string_type = string "String" >>$ String in
  let atom_type = string "Atom" >>$ Atom in
  let atom_type = string "File" >>$ File in
@@ -224,6 +224,8 @@ let rec type_expression s = (
    choice [
      attempt int_type;
      attempt real_type;
+     attempt rational_type;
+     attempt complex_type;
      attempt string_type;
      attempt atom_type;
      attempt specific_atom_type;
@@ -299,7 +301,7 @@ let variant_declaration =
       get_pos >>= fun sp ->
       name_type >>= fun n -> whitespace >> (attempt arg_list <|> return [])
       >>= fun a -> whitespace
-      >> (attempt type_ann <|> (get_pos >>= fun ep -> return (Unknown)))
+      >> (attempt type_ann <|> (get_pos >>= fun ep -> return (Void)))
       >>= fun t -> return {name = n; arguments = a; argument_type = t}
     in
     sep_by1 (whitespace >> constructor << whitespace) (char '|')
@@ -318,6 +320,9 @@ let rec basic_expr s = (
   conditional;
   lambda;
   atom_literal;
+  attempt function_declaration_and_annotation_ss;
+  attempt function_declaration;
+  attempt function_call;
   parentheses;
   string_literal;
   number_literal;
@@ -325,9 +330,6 @@ let rec basic_expr s = (
   attempt method_ss;
   attempt variant_projection;
   attempt variant_instance;
-  attempt function_declaration_and_annotation_ss;
-  attempt function_declaration_ss;
-  attempt function_call;
   attempt list_decomposition;
   list_literal;
   attempt matrix_literal;
@@ -347,13 +349,16 @@ and arithmetic_operators () =
                between (char '[') (char ']')
                        (whitespace >> expr << whitespace)
                >>= fun p -> get_pos >>= fun ep ->
-               return (fun e -> (UnOp (pos_info sp ep, (Projection p), e)))));
+               return (fun e -> (PostfixOp (pos_info sp ep, (Projection p), e)))));
     ];
     [
       infix (string "//") Frac;
     ];
     [
       postfix (char 'i') I;
+    ];
+    [
+      prefix (string "not") Not;
     ];
     [
       prefix (char '+') Add;
@@ -407,7 +412,7 @@ and assign s = (
   >>= fun n -> string ":=" >> whitespace
   >> expr ~newline_seqs:false
   >>= fun e -> get_pos
-  >>= fun ep -> return (Assignment (pos_info sp ep, false, n, e))
+  >>= fun ep -> return (Assignment (pos_info sp ep, n, e))
 )s
 
 
@@ -417,7 +422,7 @@ and assign_and_annotation_ss s = (
   >> type_expression >>= fun t -> whitespace >> string ":=" >> whitespace
   >> expr ~newline_seqs:false >>= fun e -> get_pos
   >>= fun ep -> let info = pos_info sp ep in
-  return (Sequence (info, [Annotation (info, n, t); Assignment (info, false, n, e)]))
+  return (Sequence (info, [Annotation (info, n, t); Assignment (info, n, e)]))
 )s
 
 
@@ -445,7 +450,7 @@ and lambda s = (
 )s
 
 
-and function_declaration_ss s = (
+and function_declaration s = (
   get_pos >>= fun sp ->
   name << whitespace
   >>= fun n -> char '(' >> argument_list
@@ -453,7 +458,7 @@ and function_declaration_ss s = (
   >> string ":=" >> whitespace >> expr ~newline_seqs:false
   >>= fun e -> get_pos
   >>= fun ep -> let info = pos_info sp ep in
-                return (Assignment (info, true, n, Lambda (info, arg, Arrow(Unknown, Unknown), e)))
+                return (Function (info, n, arg, e))
 )s
 
 
@@ -466,19 +471,19 @@ and function_declaration_and_annotation_ss s = (
   >>= fun t -> whitespace >> string ":=" >> whitespace >> expr ~newline_seqs:false
   >>= fun e -> get_pos
   >>= fun ep -> let info = pos_info sp ep in
-                return (Sequence (info, [Annotation (info, n, t); Assignment (info, true, n, Lambda (info, arg, t, e))]))
+                return (Sequence (info, [Annotation (info, n, t); Function (info, n, arg, e)]))
 )s
 
 
 and function_call s = (
   let arg =
-    between (char '(') (char ')') (whitespace >> expr << whitespace)
+    between (char '(') (char ')') (whitespace >> option expr << whitespace)
   in
   let rec f_call e =
     get_pos >>= fun sp ->
     whitespace >> arg
     >>= fun a -> get_pos
-    >>= fun ep -> f_call' (FunctionCall (pos_info sp ep, e, Some a))
+    >>= fun ep -> f_call' (FunctionCall (pos_info sp ep, e, a))
   and f_call' e =
     attempt (f_call e) <|> return e
   in
