@@ -332,22 +332,42 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
     | Error (i, e) -> Error (i, e)
     end
 
-(*
+
   | Match (i, m, matches) ->
     let rec type_check_matches matches matches_i checked_matches =
       match matches with
-      | [] -> (matches_i, matches)
+      | [] -> Ok (List.rev matches_i, List.rev checked_matches)
       | (p, e)::tl ->
         begin match p with
-        | VariantDecomposition (i, v, "_", e_opt) ->
-        | VariantDecomposition (i, v, c, e_opt) ->
-        | ListDecomposition (i, hd, tl) ->
-        | TupleDecomposition (i, exp_list) ->
+        | VariantDecomposition (i, v, c, names) ->
+          begin match type_check e st with
+          | Ok (i_e, e) -> type_check_matches tl (i_e::matches_i) ((p, e)::checked_matches)
+          | Error (i, msg) -> Error (i, msg)
+          end
+        | VariantDecomposition (i, v, c, names) ->
+          begin match type_check e st with
+          | Ok (i_e, e) -> type_check_matches tl (i_e::matches_i) ((p, e)::checked_matches)
+          | Error (i, msg) -> Error (i, msg)
+          end
+        | ListDecomposition (i, hd_name, tl_name) ->
+          begin match type_check e st with
+          | Ok (i_e, e) -> type_check_matches tl (i_e::matches_i) ((p, e)::checked_matches)
+          | Error (i, msg) -> Error (i, msg)
+          end
+        | TupleDecomposition (i, names) ->
+          begin match type_check e st with
+          | Ok (i_e, e) -> type_check_matches tl (i_e::matches_i) ((p, e)::checked_matches)
+          | Error (i, msg) -> Error (i, msg)
+          end
         | p ->
-          begin type_check e st with
+          begin match type_check p st with
           | Ok (i_p, p) ->
             begin match st#get_function_restype "·=·" i_p._type with
-            | Some res_type -> expr
+            | Some res_type ->
+              begin match type_check e st with
+              | Ok (i_e, e) -> type_check_matches tl (i_e::matches_i) ((p, e)::checked_matches)
+              | Error (i, msg) -> Error (i, msg)
+              end
             | None -> Error (i, "A match pattern must be a variant decomposition, a list decomposition, a tuple decomposition, the symbol \"_\" or a type with the operator ·=· defined.")
             end
           | Error (i, msg) -> Error (i, msg)
@@ -357,9 +377,9 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
     let m_st = st#next_child in
     begin match type_check m m_st with
     | Ok (i_m, m) ->
-      begin match type_check_matches matches with
+      begin match type_check_matches matches [] [] with
       | Ok (i_matches, matches) ->
-        let type_list = List.append (List.map (fun x -> x._type) i_matches) in
+        let type_list = List.map (fun x -> x._type) i_matches in
         let union_types = List.fold_left (fun t1 t2 -> Union (t1, t2)) (List.hd type_list) (List.tl type_list) in
         let i = {start_pos=i.start_pos; end_pos=i.end_pos; _type=union_types} in
                 Ok (i, Match(i, m, matches))
@@ -367,7 +387,7 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
       end
     | Error (i, e) -> Error (i, e)
     end
-*)
+
 
   | AnyMatch i -> Ok (i, AnyMatch i)
 

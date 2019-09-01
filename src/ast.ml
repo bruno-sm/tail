@@ -113,6 +113,7 @@ type expression = Sequence of info * expression list
                 | VariantDeclaration of info * string * variant_constructor list
                 | VariantInstance of info * string * string * expression option
                 | VariantProjection of info * expression * string
+                | VariantDecomposition of info * string * string * string list
                 | Assignment of info * string * expression
                 | If of info * expression * expression *
                         expression list *
@@ -127,6 +128,7 @@ type expression = Sequence of info * expression list
                 | AtomLiteral of info * string
                 | BoolLiteral of info * bool
                 | TupleLiteral of info * expression list
+                | TupleDecomposition of info * string list
                 | ListLiteral of info * expression list
                 | ListDecomposition of info * string * string
                 | VectorLiteral of info * expression list

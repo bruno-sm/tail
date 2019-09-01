@@ -568,8 +568,32 @@ and conditional s = (
 
 
 and match_exp s = (
+  let variant_decomposition =
+    let arg =
+      between (char '(') (char ')') (whitespace >> argument_list << whitespace)
+    in
+    get_pos >>= fun sp ->
+    name_type
+    >>= fun v -> string "::" >> (string "_" <|> name_type)
+    >>= fun c -> whitespace >> option arg
+    >>= fun a -> get_pos
+    >>= fun ep ->
+      match a with
+      | Some a -> return (VariantDecomposition (pos_info sp ep, v, c, a))
+      | None -> return (VariantDecomposition (pos_info sp ep, v, c, []))
+  in
+  let tuple_decomposition =
+    get_pos >>= fun sp ->
+    (whitespace >> name << whitespace)
+    >>= fun first_name -> char ','
+    >>= fun _ -> sep_by1 (whitespace >> name << whitespace) (char ',')
+    >>= fun names_list -> get_pos
+    >>= fun ep -> return (TupleDecomposition (pos_info sp ep, first_name::names_list))
+  in
   let pattern_expr =
-    attempt (get_pos >>= fun sp -> char '_' >> get_pos >>= fun ep -> return (AnyMatch (pos_info sp ep)))
+    attempt (variant_decomposition) <|>
+    attempt (list_decomposition) <|>
+    attempt (tuple_decomposition) <|>   attempt (get_pos >>= fun sp -> char '_' >> get_pos >>= fun ep -> return (AnyMatch (pos_info sp ep)))
     <|> expr
   in
   let match_option =
