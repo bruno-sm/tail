@@ -1,0 +1,9 @@
+(env
+  (dev
+    (flags (:standard -warn-error -A))))
+
+(library
+  (name semantic_tests)
+  (wrapped false)
+  (modules semantic_tests)
+  (libraries alcotest tailsemantic ast))

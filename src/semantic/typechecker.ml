@@ -2,6 +2,188 @@ open Ast
 open Symbols_table
 
 
+let rec max_extrema (t : type_expression) : type_expression =
+  match t with
+  | Unknown -> Universe
+  | Arrow (s, d) -> Arrow (min_extrema s, max_extrema d)
+  | Tuple l -> Tuple (List.map max_extrema l)
+  | List t -> List (max_extrema t)
+  | Vector t -> Vector (max_extrema t)
+  | Matrix t -> Matrix (max_extrema t)
+  | Dictionary (k, v) -> Dictionary (max_extrema k, max_extrema v)
+  | Union (t1, t2) -> Union (max_extrema t1, max_extrema t2)
+  | Intersection (t1, t2) -> Intersection (max_extrema t1, max_extrema t2)
+  | Complement t -> Complement (max_extrema t)
+  | ParenthesesType t -> ParenthesesType (max_extrema t)
+  | t -> t
+
+and min_extrema (t : type_expression) : type_expression =
+  match t with
+  | Unknown -> Void
+  | Arrow (s, d) -> Arrow (max_extrema s, min_extrema d)
+  | Tuple l -> Tuple (List.map min_extrema l)
+  | List t -> List (min_extrema t)
+  | Vector t -> Vector (min_extrema t)
+  | Matrix t -> Matrix (min_extrema t)
+  | Dictionary (k, v) -> Dictionary (min_extrema k, min_extrema v)
+  | Union (t1, t2) -> Union (min_extrema t1, min_extrema t2)
+  | Intersection (t1, t2) -> Intersection (min_extrema t1, min_extrema t2)
+  | Complement t -> Complement (min_extrema t)
+  | ParenthesesType t -> ParenthesesType (min_extrema t)
+  | t -> t
+
+
+let rec (<=) (t1 : type_expression) (t2 : type_expression) : bool =
+  match (t1, t2) with
+  | (_, Universe) -> true
+  | (Int, Rational) -> true
+  | (Int, Real) -> true
+  | (Int, Complex) -> true
+  | (Rational, Real) -> true
+  | (Rational, Complex) -> true
+  | (Real, Complex) -> true
+  | (SpecificAtom _, Atom) -> true
+  | (WriteFile, File) -> true
+  | (ReadFile, File) -> true
+  | (Arrow (t1, t2), Arrow (s1, s2)) -> s1 <= t1 && t2 <= s1
+  | (Tuple l1, Tuple l2) -> List.fold_left2 (fun x t1 t2 -> x && t1 <= t2) true l1 l2
+  | (Union(t11, t12), t2) -> t11 <= t2 && t12 <= t2
+  | (t1, Union(t21, t22)) -> t1 <= t21 || t1 <= t22
+  | (Intersection(Union(s1, s2), Union(t1, t2)), t) -> (not (s1 <= Union(t1, t2)) || s1 <= t) &&
+                                                       (not (s2 <= Union(t1, t2)) || s2 <= t) &&
+                                                       (not (t1 <= Union(s1, s2)) || t1 <= t) &&
+                                                       (not (t2 <= Union(s1, s2)) || t2 <= t)
+  | (Intersection(t11, t12), t2) -> (not (t11 <= t12) || t11 <= t2) &&
+                                    (not (t12 <= t11) || t11 <= t2)
+  | (t1, Intersection(t21, t22)) -> t1 <= t21 && t1 <= t22
+  | (Complement (Union (t11, t12)), t21) -> Intersection(Complement(t11), Complement(t12)) <= t21
+  | (Complement t11, Union(t21, t22)) -> not (t11 <= t21 || t11 <= t22)
+  | (Complement (Complement t11), t2) -> t11 <= t2
+  | (t1, Complement t21) -> Intersection(t1, t21) <= Void
+  | (ParenthesesType t11, t2) -> t11 <= t2
+  | (Void, _) -> true
+  | (t1, t2) -> t1 = t2
+
+and (<=~) (t1 : type_expression) (t2 : type_expression) : bool =
+  min_extrema t1 <= max_extrema t2
+
+and (</=~) (t1 : type_expression) (t2 : type_expression) : bool =
+  not (max_extrema t1 <= min_extrema t2)
+
+
+let rec aplicative_concretization_plus (t:type_expression) : type_expression list list =
+  match t with
+  | Void -> []
+  | Unknown -> [[Arrow (Unknown, Unknown)]]
+  | Arrow (s, t) -> [[Arrow (s, t)]]
+  | Complement t -> aplicative_concretization_minus t
+  | Union (t1, t2) -> List.append (aplicative_concretization_plus t1)
+                                  (aplicative_concretization_plus t2)
+  | Intersection (t1, t2) -> List.map2 (fun l1 l2 -> List.append l1 l2)
+                                       (aplicative_concretization_plus t1)
+                                       (aplicative_concretization_plus t2)
+  | _ -> [[]]
+
+and aplicative_concretization_minus (t:type_expression) : type_expression list list =
+  match t with
+  | Universe -> []
+  | Complement t -> aplicative_concretization_plus t
+  | Intersection (t1, t2) -> List.append (aplicative_concretization_minus t1)
+                                         (aplicative_concretization_minus t2)
+  | Union (t1, t2) -> List.map2 (fun l1 l2 -> List.append l1 l2)
+                                (aplicative_concretization_minus t1)
+                                (aplicative_concretization_minus t2)
+  | _ -> [[]]
+
+
+let rec simplify (t:type_expression) : type_expression =
+  match t with
+  | Union (Void, t2) -> simplify t2
+  | Union (t1, Void) -> simplify t1
+  | Union (t1, t2) ->
+    let s1 = simplify t1 in
+    let s2 = simplify t2 in
+    if simplify s1 <= s2 then s2 else begin if s2 <= s1 then s1 else Union (s1, s2) end
+  | Intersection (Universe, t2) -> simplify t2
+  | Intersection (t1, Universe) -> simplify t1
+  | Intersection (t1, t2) ->
+    let s1 = simplify t1 in
+    let s2 = simplify t2 in
+    if simplify s1 <= s2 then s1 else begin if s2 <= s1 then s2 else Intersection (s1, s2) end
+  | Complement (Complement t) -> simplify t
+  | _ -> t
+
+
+(* Operation  ⋃_{t € l} f(t) *)
+let fold_union f l = List.fold_left (fun x t -> Union (x, f(t))) Void l
+
+(* Operation ⋂_{t € l} f(t) *)
+let fold_intersection f l = List.fold_left (fun x t -> Intersection (x, f(t))) Universe l
+
+
+let dom (t:type_expression) : type_expression =
+  fold_intersection
+  begin fun s ->
+    fold_union
+    begin fun t ->
+      match t with
+      | Arrow(s1, s2) -> max_extrema s1
+      | _ -> Void
+    end
+    s
+  end
+  (aplicative_concretization_plus t)
+  |> simplify
+
+
+let (@~) (t1:type_expression) (t2:type_expression) : type_expression =
+  let setdiff l1 l2 = List.filter (fun x -> not (List.mem x l2)) l1 in
+  let rec powerset = function
+    | [] -> [[]]
+    | x :: xs ->
+       let ps = powerset xs in
+       ps @ List.map (fun ss -> x :: ss) ps
+  in
+  fold_union
+  begin fun s ->
+    let q_list = setdiff (powerset s) [s] in
+    let cond1 q =
+      t2 </=~ (fold_union
+                begin fun t ->
+                match t with
+                | Arrow(s, t) -> s
+                | _ -> Void
+                end
+                q)
+    in
+    let cond2 q =
+      Intersection(max_extrema t2,
+                   fold_union
+                     begin fun t ->
+                     match t with
+                     | Arrow(s, t) -> max_extrema s
+                     | _ -> Void
+                     end
+                     (setdiff s q))
+      </=~ Void
+    in
+    let q_list = (List.filter (fun q -> cond1 q && cond2 q) q_list) in
+    fold_union
+    begin fun q ->
+      fold_intersection
+      begin fun t ->
+        match t with
+        | Arrow(s, t) -> t
+        | _ -> Void
+      end
+      (setdiff s q)
+    end
+    q_list
+  end
+  (aplicative_concretization_plus t1)
+  |> simplify
+
+
 (* Checks type consistency and decorates the AST with the expression types *)
 let rec type_check (e : expression) (st : symbols_table) : (info * expression, info * string) result =
   match e with
