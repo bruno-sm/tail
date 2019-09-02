@@ -87,18 +87,18 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
 
 
   method find_function name arg_type =
-    let rec compatible_arg_type st arg_type =
+  (*  let rec compatible_arg_type st arg_type =
       match (st, arg_type) with
       | (Tuple st_l, Tuple arg_type_l) ->
         List.map2 (fun t1 t2 -> compatible_arg_type t1 t2) st_l arg_type_l |>
         List.fold_left (fun x y -> x && y) true
       | _ -> arg_type = Unknown || st = Unknown || st = arg_type
     in
+  *)
     try
       Some (Vect.find (
         fun x -> match x with
-                 | FunctionEntry (n, st, dt) -> n = name &&
-                                                compatible_arg_type st arg_type
+                 | FunctionEntry (n, st, dt) -> n = name && arg_type <=~ st
                  | _ -> false
       ) table)
     with
@@ -124,6 +124,11 @@ class symbols_table (parent : (symbols_table ref) option) = object(self)
   method get_function_restype name arg_type =
     match self#find_function name arg_type with
       | Some (FunctionEntry (n, st, dt)) -> Some dt
+      | _ -> None
+
+  method get_function_by_argtype name arg_type =
+    match self#find_function name arg_type with
+      | Some (FunctionEntry (n, st, dt)) -> Some (FunctionEntry (n, st, dt))
       | _ -> None
 
 

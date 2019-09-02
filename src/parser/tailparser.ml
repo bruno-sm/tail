@@ -185,9 +185,9 @@ let rec type_expression s = (
  let complex_type = string "Complex" >>$ Complex in
  let string_type = string "String" >>$ String in
  let atom_type = string "Atom" >>$ Atom in
- let atom_type = string "File" >>$ File in
- let atom_type = string "WriteFile" >>$ WriteFile in
- let atom_type = string "ReadFile" >>$ ReadFile in
+ let file_type = string "File" >>$ File in
+ let write_type = string "WriteFile" >>$ WriteFile in
+ let read_type = string "ReadFile" >>$ ReadFile in
  let specific_atom_type = char ':' >> name_type |>> fun n -> SpecificAtom n in
  let bool_type = string "Bool" >>$ Bool in
  let unknown_type = char '?' >>$ Unknown in
@@ -228,6 +228,9 @@ let rec type_expression s = (
      attempt complex_type;
      attempt string_type;
      attempt atom_type;
+     attempt file_type;
+     attempt read_type;
+     attempt write_type;
      attempt specific_atom_type;
      attempt bool_type;
      attempt unknown_type;
