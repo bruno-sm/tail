@@ -73,7 +73,7 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
                Error (i, Printf.sprintf "Operator %s is not defined for type %s."
                                          op_name (string_of_type_expression arg_type))
       |Some res_type -> let i = {start_pos=i.start_pos; end_pos=ei.end_pos; _type=res_type} in
-                        Ok (i, PrefixOp (i, op, e))
+                        Ok (i, PostfixOp (i, op, e))
       end
     | Error (i, s) -> Error (i, s)
     end

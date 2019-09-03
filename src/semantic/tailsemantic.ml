@@ -10,8 +10,8 @@ let check_semantics ast =
   st#reset_child_position;
   match scope_check ast st with
   | Ok st -> begin match st#reset_child_position; type_check ast st with
-             | Ok (_, ast) -> Ok ()
-             | Error (i, msg) -> print_endline msg; Error (i, msg)
+             | Ok (_, ast) -> Ok ast
+             | Error (i, msg) -> Error (i, msg)
              end
   | Error (i, msg) -> Error (i, msg)
 

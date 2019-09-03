@@ -207,12 +207,12 @@ let rec string_of_expression ident = function
                           ident
                           (string_of_expression (ident ^ " ") e2)
 
-  | PrefixOp (_, op, e) -> Printf.sprintf "UnOp(%s)\n%s| %s\n"
+  | PrefixOp (_, op, e) -> Printf.sprintf "PrefixOp(%s)\n%s| %s\n"
                           (string_of_operator ident op)
                           ident
                           (string_of_expression (ident ^ " ") e)
 
-  | PostfixOp (_, op, e) -> Printf.sprintf "UnOp(%s)\n%s| %s\n"
+  | PostfixOp (_, op, e) -> Printf.sprintf "PostfixOp(%s)\n%s| %s\n"
                           (string_of_operator ident op)
                           ident
                           (string_of_expression (ident ^ " ") e)

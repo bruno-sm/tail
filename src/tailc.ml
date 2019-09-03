@@ -1,5 +1,6 @@
 module P = Tailparser
 module S = Tailsemantic
+module C = Codegen
 
 
 type command = CmdDefault
@@ -10,17 +11,21 @@ type command = CmdDefault
 let rec tailc source output command =
   try
     Printf.printf "source: %s\noutput: %s\n" source output;
-    compile @@ open_in source
+    compile (open_in source) output
   with
     | Sys_error msg -> print_endline msg
 
 
-and compile source_channel =
+and compile source_channel output_file =
   match P.parse source_channel with
   | Ok ast ->
     (*Ast.string_of_expression ast |> print_endline;*)
     begin match S.check_semantics ast with
-    | Ok () -> ()
+    | Ok ast ->
+      begin match C.compile ast output_file with
+      | Ok () -> ()
+      | Error msg -> Printf.printf "Compilation error:\n\n%s" msg
+      end
     | Error (i, msg) -> S.print_semantic_error source_channel i msg
     end
   | Error (pos, msg) -> P.print_syntax_error source_channel pos msg
