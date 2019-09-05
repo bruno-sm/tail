@@ -100,6 +100,7 @@ let rec string_of_type_expression = function
 
 
 type expression = Sequence of info * expression list
+                | Unit
                 | Parentheses of info * expression
                 | Block of info * expression
                 | BinOp of info * operator * expression * expression
@@ -187,6 +188,8 @@ let operator_name = function
 
 
 let rec string_of_expression ident = function
+  | Unit -> "Unit"
+  
   | Sequence (_, exp_list) -> Printf.sprintf "Sequence\n%s| %s\n"
                          ident
                          (List.map (string_of_expression (ident ^ " ")) exp_list |>

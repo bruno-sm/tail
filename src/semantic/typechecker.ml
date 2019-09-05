@@ -42,7 +42,7 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
                Error (i, Printf.sprintf "Operator %s is not defined for type %s."
                                          op_name (string_of_type_expression arg_type))
       |Some res_type -> let i = {start_pos=e1i.start_pos; end_pos=e2i.end_pos; _type=res_type} in
-                        Ok (i, BinOp (i, op, e1, e2))
+                        Ok (i, FunctionCall (i, Variable(i, op_name), Some (TupleLiteral (i, [e1; e2]))))
       end
     | (Error (i, s), _) -> Error (i, s)
     | (_, Error (i, s)) -> Error (i, s)
@@ -86,7 +86,11 @@ let rec type_check (e : expression) (st : symbols_table) : (info * expression, i
     | _ -> Error (i, Printf.sprintf "%s doesn't exist." v)
     end
 
-  | Function (i, n, args, e) -> type_check e st#next_child
+  | Function (i, n, args, e) ->
+    begin match type_check e st#next_child with
+    | Ok (_, e) -> Ok (i, Function (i, n, args, e))
+    | Error (i, msg) -> Error (i, msg)
+    end
 
   | Lambda (i, args, t, e) ->
     begin match t with

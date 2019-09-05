@@ -16,4 +16,4 @@
   (public_name tailc)
   (package tail)
   (modules tailc)
-  (libraries base cmdliner result tailparser tailsemantic codegen ast))
+  (libraries base cmdliner result tailparser tailsemantic ast))

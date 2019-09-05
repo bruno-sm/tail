@@ -1,6 +1,8 @@
 open Ast
 open Symbols_table
 
+exception ScopeError of info * string
+
 
 let fill_predefined (st:symbols_table) : symbols_table =
   st#add_entry (FunctionEntry ("write", Tuple([String; WriteFile]), Void));
@@ -228,7 +230,7 @@ let rec fill_constants (ast:Ast.expression) (st:symbols_table) : symbols_table =
   | Assignment (_, n, e) ->
     fill_constants e (new symbols_table (Some (ref st))) |> st#add_child; st
 
-  | Function (_, n, args, e) ->
+  | Function (i, n, args, e) ->
     let e_st = (new symbols_table (Some (ref st))) in
     let rec add_args st = function
       | [] -> ()
@@ -249,13 +251,16 @@ let rec fill_constants (ast:Ast.expression) (st:symbols_table) : symbols_table =
                             fill_constants e e_st |> st#add_child;
                             st
                           end else
-                            st
+                            raise (ScopeError (i, Printf.sprintf "El número de argumentos de la función %s no se corresponde con el tipo %s"
+                                                                 n (string_of_type_expression ts)))
       | _ -> st#add_entry (FunctionEntry (n, Unknown, Unknown));
-             fill_constants e (new symbols_table (Some (ref st))) |> st#add_child;
+             add_args e_st (List.combine args (List.init (List.length args) (fun _ -> Unknown)));
+             fill_constants e e_st |> st#add_child;
              st
       end
     | _ -> st#add_entry (FunctionEntry (n, Unknown, Unknown));
-           fill_constants e (new symbols_table (Some (ref st))) |> st#add_child;
+           add_args e_st (List.combine args (List.init (List.length args) (fun _ -> Unknown)));
+           fill_constants e e_st |> st#add_child;
            st
     end
 

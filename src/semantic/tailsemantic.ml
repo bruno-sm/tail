@@ -4,16 +4,21 @@ open Typechecker
 open Ast
 
 let check_semantics ast =
-  let st = new symbols_table None in
-  let st = fill_predefined st in
-  let st = fill_constants ast st in
-  st#reset_child_position;
-  match scope_check ast st with
-  | Ok st -> begin match st#reset_child_position; type_check ast st with
-             | Ok (_, ast) -> Ok ast
-             | Error (i, msg) -> Error (i, msg)
-             end
-  | Error (i, msg) -> Error (i, msg)
+  try
+    let st = new symbols_table None in
+    let st = fill_predefined st in
+    let st = fill_constants ast st in
+    st#reset_child_position;
+    (*st#to_string "" |> print_endline;*)
+    match scope_check ast st with
+    | Ok st -> begin match st#reset_child_position; type_check ast st with
+               | Ok (_, ast) -> Ok ast
+               | Error (i, msg) -> Error (i, msg)
+               end
+    | Error (i, msg) -> Error (i, msg)
+  with
+  | ScopeError (i, msg) -> Error (i, msg)
+
 
 
 (* Prints pretty error messages *)
